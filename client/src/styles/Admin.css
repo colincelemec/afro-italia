@@ -1,0 +1,345 @@
+/* ============================================
+   Admin Panel — stile coerente con la dashboard
+   Usa i token tema (chiaro/scuro) di index.css
+   ============================================ */
+
+.ad {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-base);
+  padding-bottom: 4rem;
+}
+
+.ad-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ──────── HERO ──────── */
+.ad-hero {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark, var(--color-primary)));
+  color: var(--color-on-primary, #fff);
+  padding: 2.5rem 0 2rem;
+  margin-bottom: 1.75rem;
+}
+.ad-hero h1 {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin: 0 0 .35rem;
+  font-family: var(--font-display, var(--font-base));
+  font-size: 1.9rem;
+}
+.ad-hero p { margin: 0; opacity: .9; font-size: 1rem; }
+
+/* ──────── ALERT ──────── */
+.ad-alert {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--color-error-soft);
+  color: var(--color-error);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius);
+  padding: .7rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: .9rem;
+}
+.ad-alert button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+/* ──────── TABS ──────── */
+.ad-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1.5rem;
+}
+.ad-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-muted);
+  font: inherit;
+  font-weight: 600;
+  padding: .7rem .9rem;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.ad-tab:hover { color: var(--color-text); }
+.ad-tab--active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+.ad-tab__count {
+  background: var(--color-border);
+  color: var(--color-text);
+  border-radius: 999px;
+  padding: 0 .5rem;
+  font-size: .75rem;
+  min-width: 1.4rem;
+  text-align: center;
+}
+.ad-tab--active .ad-tab__count {
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
+/* ──────── OVERVIEW CARDS ──────── */
+.ad-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.ad-card {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  box-shadow: var(--shadow);
+}
+.ad-card__icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--color-primary-soft, var(--color-border));
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+.ad-card__body { display: flex; flex-direction: column; }
+.ad-card__value { font-size: 1.7rem; font-weight: 800; line-height: 1; }
+.ad-card__label { font-size: .85rem; color: var(--color-muted); margin-top: .25rem; }
+
+.ad-card--green .ad-card__icon { background: var(--color-success-soft); color: var(--color-success); }
+.ad-card--red   .ad-card__icon { background: var(--color-error-soft);   color: var(--color-error); }
+.ad-card--amber .ad-card__icon { background: rgba(232,163,61,.16);       color: var(--color-accent); }
+
+.ad-note {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  margin-top: 1.25rem;
+  color: var(--color-muted);
+  font-size: .9rem;
+}
+
+/* ──────── TOOLBAR / FILTRI ──────── */
+.ad-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.ad-search {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .55rem .8rem;
+  color: var(--color-muted);
+  flex: 1 1 220px;
+  max-width: 340px;
+}
+.ad-search input {
+  border: none;
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  width: 100%;
+  outline: none;
+}
+.ad-filters { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ad-chip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  border-radius: 999px;
+  padding: .4rem .85rem;
+  font: inherit;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.ad-chip:hover { color: var(--color-text); border-color: var(--color-primary); }
+.ad-chip--on {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+}
+
+/* ──────── TABLE ──────── */
+.ad-table-wrap {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.ad-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.ad-table thead th {
+  text-align: left;
+  padding: .8rem 1rem;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font-weight: 600;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  border-bottom: 1px solid var(--color-border);
+}
+.ad-table tbody td {
+  padding: .85rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+.ad-table tbody tr:last-child td { border-bottom: none; }
+.ad-table tbody tr:hover { background: var(--color-bg); }
+.ad-table strong { display: block; font-weight: 600; }
+.ad-sub { display: block; color: var(--color-muted); font-size: .78rem; margin-top: .1rem; }
+.ad-th-actions, .ad-actions { text-align: right; white-space: nowrap; }
+.ad-actions { display: flex; gap: .35rem; justify-content: flex-end; align-items: center; }
+
+/* ──────── BADGE STATO ──────── */
+.ad-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  border-radius: 999px;
+  padding: .2rem .6rem;
+  font-size: .75rem;
+  font-weight: 600;
+}
+.ad-badge--verified  { background: var(--color-success-soft); color: var(--color-success); }
+.ad-badge--pending   { background: rgba(232,163,61,.16);       color: var(--color-accent); }
+.ad-badge--rejected  { background: var(--color-error-soft);    color: var(--color-error); }
+.ad-badge--suspended { background: var(--color-border);        color: var(--color-muted); }
+
+/* ──────── RUOLO ──────── */
+.ad-role {
+  display: inline-block;
+  border-radius: 6px;
+  padding: .15rem .5rem;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.ad-role--user     { background: var(--color-border);        color: var(--color-muted); }
+.ad-role--business { background: var(--color-primary-soft, rgba(232,163,61,.16)); color: var(--color-primary); }
+.ad-role--admin    { background: var(--color-success-soft);  color: var(--color-success); }
+.ad-you { color: var(--color-muted); font-weight: 400; font-size: .8rem; }
+
+/* ──────── BOTTONI AZIONE ──────── */
+.ad-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all .15s;
+}
+.ad-btn:hover:not(:disabled) { color: var(--color-text); border-color: var(--color-primary); }
+.ad-btn:disabled { opacity: .4; cursor: not-allowed; }
+.ad-btn--ok:hover:not(:disabled)     { color: var(--color-success); border-color: var(--color-success); }
+.ad-btn--danger:hover:not(:disabled) { color: var(--color-error);   border-color: var(--color-error); }
+.ad-btn--warn:hover:not(:disabled)   { color: var(--color-accent);  border-color: var(--color-accent); }
+
+.ad-select {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: .35rem .5rem;
+  font: inherit;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.ad-select:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ──────── RECENSIONI SEGNALATE ──────── */
+.ad-reviews { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .75rem; }
+.ad-review {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+.ad-review__main { flex: 1; min-width: 0; }
+.ad-review__head { display: flex; align-items: center; gap: .6rem; margin-bottom: .4rem; }
+.ad-review__text { margin: .2rem 0 .5rem; color: var(--color-text); font-style: italic; }
+
+/* ──────── EMPTY / LOADING ──────── */
+.ad-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  padding: 3rem 1rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+.ad-loading { display: grid; gap: .75rem; }
+.ad-skeleton {
+  height: 56px;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-border) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: ad-shimmer 1.3s infinite;
+}
+@keyframes ad-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ──────── RESPONSIVE: tabelle → card su mobile ──────── */
+@media (max-width: 760px) {
+  .ad-table thead { display: none; }
+  .ad-table, .ad-table tbody, .ad-table tr, .ad-table td { display: block; width: 100%; }
+  .ad-table tr {
+    border-bottom: 1px solid var(--color-border);
+    padding: .5rem 0;
+  }
+  .ad-table tbody td {
+    border: none;
+    padding: .35rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .ad-table tbody td::before {
+    content: attr(data-label);
+    color: var(--color-muted);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    font-weight: 600;
+  }
+  .ad-actions { justify-content: flex-start; flex-wrap: wrap; }
+}

@@ -1,0 +1,342 @@
+/* ============================================
+   Dashboard — Personal Hub + Map (clean & minimal)
+   ============================================ */
+
+.dh {
+  --dh-text: var(--color-text);
+  --dh-muted: var(--color-muted);
+  --dh-border: var(--color-border);
+  --dh-bg: var(--color-bg);
+  --dh-card: var(--color-surface);
+  --dh-accent: var(--color-primary);
+  --dh-accent-soft: var(--color-primary-soft);
+  --dh-radius: 14px;
+  background: var(--dh-bg);
+  color: var(--dh-text);
+  min-height: 100vh;
+  font-family: var(--font-base);
+}
+
+.dh-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── Hero ── */
+.dh-hero {
+  background: var(--dh-card);
+  border-bottom: 1px solid var(--dh-border);
+  padding: 48px 0 40px;
+}
+.dh-hero h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.dh-hero p {
+  color: var(--dh-muted);
+  margin: 0 0 24px;
+  max-width: 520px;
+}
+.dh-hero__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Bottoni ── */
+.dh-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.dh-btn--primary {
+  background: var(--dh-accent);
+  color: var(--color-on-primary);
+}
+.dh-btn--primary:hover { background: var(--color-primary-dark); }
+.dh-btn--outline {
+  background: transparent;
+  color: var(--dh-accent);
+  border: 1.5px solid var(--dh-accent);
+}
+.dh-btn--outline:hover { background: var(--dh-accent-soft); }
+.dh-btn--ghost {
+  background: var(--dh-accent-soft);
+  color: var(--dh-accent);
+}
+
+/* ── Card "I miei servizi" con azioni modifica/elimina ── */
+.dh-myservice {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.dh-myservice__actions {
+  display: flex;
+  gap: .5rem;
+}
+.dh-myservice__actions .dh-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  padding: 9px 12px;
+  font-size: .85rem;
+}
+.dh-btn--danger {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+  border: 1px solid transparent;
+}
+.dh-btn--danger:hover { border-color: var(--color-error); }
+
+/* ── Statistiche ── */
+.dh-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 28px 0;
+}
+.dh-stat {
+  background: var(--dh-card);
+  border: 1px solid var(--dh-border);
+  border-radius: var(--dh-radius);
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.dh-stat:hover { border-color: var(--dh-accent); }
+.dh-stat--active {
+  border-color: var(--dh-accent);
+  background: var(--dh-accent-soft);
+}
+.dh-stat__num {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--dh-accent);
+}
+.dh-stat__label {
+  font-size: 0.88rem;
+  color: var(--dh-muted);
+}
+
+/* ── Sezioni ── */
+.dh-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.dh-section-head h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+.dh-section-sub {
+  font-size: 0.85rem;
+  color: var(--dh-muted);
+}
+
+/* ── Mappa ── */
+.dh-map-section { margin: 36px 0; }
+.dh-map {
+  height: 420px;
+  border-radius: var(--dh-radius);
+  overflow: hidden;
+  border: 1px solid var(--dh-border);
+  background: var(--dh-card);
+  position: relative;
+  z-index: 0; /* evita che la mappa copra header/dropdown */
+}
+.dh-map .leaflet-container { font: inherit; }
+.dh-popup strong { font-size: 0.95rem; }
+.dh-popup p {
+  margin: 4px 0;
+  color: var(--dh-muted);
+  font-size: 0.82rem;
+}
+.dh-popup a {
+  color: var(--dh-accent);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+/* ── Tabs ── */
+.dh-tabs-section { margin: 36px 0 60px; }
+.dh-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--dh-border);
+  margin-bottom: 22px;
+}
+.dh-tab {
+  background: none;
+  border: none;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dh-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color .15s ease;
+}
+.dh-tab:hover { color: var(--dh-text); }
+.dh-tab--active {
+  color: var(--dh-accent);
+  border-bottom-color: var(--dh-accent);
+}
+.dh-tab__count {
+  background: var(--dh-bg);
+  border: 1px solid var(--dh-border);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+.dh-tab--active .dh-tab__count {
+  background: var(--dh-accent-soft);
+  border-color: var(--dh-accent);
+}
+
+/* ── Griglia card ── */
+.dh-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.dh-bizcard {
+  background: var(--dh-card);
+  border: 1px solid var(--dh-border);
+  border-radius: var(--dh-radius);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.dh-bizcard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+}
+.dh-bizcard__media {
+  height: 130px;
+  background: var(--dh-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dh-bizcard__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.dh-bizcard__fallback { color: var(--color-primary-light); opacity: .6; }
+.dh-bizcard__body { padding: 14px 16px 16px; }
+.dh-bizcard__body h4 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.dh-bizcard__meta {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+  color: var(--dh-muted);
+}
+.dh-bizcard__rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--dh-muted);
+}
+
+/* ── Stelle ── */
+.dh-stars .on { color: var(--color-accent); }
+.dh-stars .off { color: var(--color-border); }
+
+/* ── Recensioni ── */
+.dh-reviews {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.dh-review {
+  background: var(--dh-card);
+  border: 1px solid var(--dh-border);
+  border-radius: var(--dh-radius);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: border-color .15s ease;
+}
+.dh-review:hover { border-color: var(--dh-accent); }
+.dh-review__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.dh-review__text {
+  margin: 0 0 8px;
+  font-size: 0.92rem;
+  color: var(--dh-text);
+}
+.dh-review__meta {
+  font-size: 0.8rem;
+  color: var(--dh-muted);
+}
+
+/* ── Stati vuoti / loading ── */
+.dh-empty {
+  text-align: center;
+  padding: 48px 20px;
+  background: var(--dh-card);
+  border: 1px dashed var(--dh-border);
+  border-radius: var(--dh-radius);
+}
+.dh-empty__svg {
+  display: block;
+  margin: 0 auto 10px;
+  color: var(--color-primary-light);
+  opacity: .7;
+}
+.dh-empty p {
+  color: var(--dh-muted);
+  margin: 0 0 16px;
+}
+.dh-loading {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+.dh-skeleton {
+  height: 220px;
+  border-radius: var(--dh-radius);
+  background: linear-gradient(90deg, #161b22 25%, #21262d 50%, #161b22 75%);
+  background-size: 200% 100%;
+  animation: dh-shimmer 1.4s infinite;
+}
+@keyframes dh-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .dh-hero { padding: 32px 0 28px; }
+  .dh-hero h1 { font-size: 1.5rem; }
+  .dh-stats { grid-template-columns: 1fr; }
+  .dh-map { height: 300px; }
+  .dh-tabs { overflow-x: auto; }
+}

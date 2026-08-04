@@ -1,0 +1,112 @@
+/* ============================================
+   ConfirmDialog — popup di conferma
+   ============================================ */
+
+.cdialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  animation: cdialog-fade 0.18s ease;
+}
+
+.cdialog {
+  width: 100%;
+  max-width: 380px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 28px 24px 22px;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: cdialog-pop 0.22s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+
+.cdialog__icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.cdialog__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-bright, var(--color-text));
+  margin: 0 0 8px;
+}
+
+.cdialog__message {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 22px;
+}
+
+.cdialog__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cdialog__btn {
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cdialog__btn--cancel {
+  background: transparent;
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+
+.cdialog__btn--cancel:hover {
+  border-color: var(--color-muted);
+  background: var(--color-primary-soft);
+}
+
+.cdialog__btn--yes {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: 1.5px solid var(--color-primary);
+}
+
+.cdialog__btn--yes:hover {
+  background: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.cdialog__btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@keyframes cdialog-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes cdialog-pop {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdialog-overlay, .cdialog { animation: none; }
+}

@@ -1,0 +1,78 @@
+{
+  "name": "afro-italia-server",
+  "version": "2.0.0",
+  "description": "Backend API REST pour AfroItalia Platform",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:seed": "node prisma/seed.js",
+    "db:reset": "prisma migrate reset --force",
+    "db:generate": "prisma generate",
+    "docker:up": "docker-compose up",
+    "docker:up:build": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "docker:down:volumes": "docker-compose down -v",
+    "docker:logs": "docker-compose logs -f",
+    "docker:restart": "docker-compose restart",
+    "docker:build": "docker-compose build",
+    "docker:seed": "docker-compose exec api npm run db:seed",
+    "docker:studio": "docker-compose exec api npx prisma studio",
+    "db:seed:censimento": "node prisma/seeds/businesses-reali.js",
+    "db:init": "prisma db push && node prisma/seed.js && node prisma/seeds/businesses-reali.js",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "express",
+    "api",
+    "rest",
+    "postgresql",
+    "prisma"
+  ],
+  "author": "AfroItalia Team",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^5.7.1",
+    "axios": "^1.6.2",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "google-auth-library": "^10.6.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.7",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "stripe": "^14.9.0"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.1",
+    "supertest": "^7.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/tests/setup-env.js"
+    ],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ],
+    "clearMocks": false
+  }
+}

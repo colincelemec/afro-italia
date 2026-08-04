@@ -1,0 +1,245 @@
+// Schéma Prisma pour AfroItalia Platform
+// Base de données: PostgreSQL avec extension PostGIS
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// UTILISATEURS & AUTHENTIFICATION
+// ============================================
+
+enum UserRole {
+  USER          // Utilisateur simple
+  BUSINESS      // Propriétaire d'entreprise
+  ADMIN         // Administrateur
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String?   @map("password_hash")
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  phone         String?
+  avatar        String?   // URL de l'avatar
+  role          UserRole  @default(USER)
+  isVerified    Boolean   @default(false) @map("is_verified")
+  googleId      String?   @unique @map("google_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  businesses    Business[]
+  reviews       Review[]
+  favorites     Favorite[]
+
+  @@map("users")
+}
+
+// ============================================
+// VILLES & CATÉGORIES
+// ============================================
+
+model City {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  region      String      // Ex: Lombardia, Lazio
+  latitude    Float
+  longitude   Float
+  description String?
+  image       String?     // Image de la ville
+  isActive    Boolean     @default(true) @map("is_active")
+  order       Int         @default(0) // Pour l'ordre d'affichage
+
+  // Relations
+  businesses  Business[]
+
+  @@map("cities")
+}
+
+model Category {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  icon        String?     // Icon name ou URL
+  color       String?     // Couleur pour l'UI
+  order       Int         @default(0)
+  isActive    Boolean     @default(true) @map("is_active")
+
+  // Relations
+  businesses  Business[]
+
+  @@map("categories")
+}
+
+// ============================================
+// ENTREPRISES
+// ============================================
+
+enum SubscriptionTier {
+  FREE
+  BASIC
+  PREMIUM
+}
+
+enum BusinessStatus {
+  PENDING     // En attente de vérification
+  VERIFIED    // Vérifié
+  REJECTED    // Rejeté
+  SUSPENDED   // Suspendu
+}
+
+model Business {
+  id              String            @id @default(cuid())
+  ownerId         String            @map("owner_id")
+  name            String
+  slug            String            @unique
+  description     String
+  shortDesc       String?           @map("short_desc") // Description courte pour les listes
+
+  // Localisation
+  cityId          String            @map("city_id")
+  address         String
+  latitude        Float
+  longitude       Float
+  zipCode         String?           @map("zip_code")
+
+  // Catégorie
+  categoryId      String            @map("category_id")
+
+  // Contact
+  phone           String?
+  email           String?
+  website         String?
+  whatsapp        String?
+
+  // Médias
+  logo            String?           // URL du logo
+  coverImage      String?           @map("cover_image")
+  images          String[]          // Array d'URLs
+
+  // Horaires (JSON: {monday: {open: "09:00", close: "18:00"}, ...})
+  hours           Json?
+
+  // Réseaux sociaux
+  facebook        String?
+  instagram       String?
+  twitter         String?
+  tiktok          String?
+
+  // Business info
+  subscriptionTier SubscriptionTier @default(FREE) @map("subscription_tier")
+  status          BusinessStatus    @default(PENDING)
+  isVerified      Boolean           @default(false) @map("is_verified")
+  verifiedAt      DateTime?         @map("verified_at")
+
+  // Stats
+  viewCount       Int               @default(0) @map("view_count")
+  reviewCount     Int               @default(0) @map("review_count")
+  averageRating   Float             @default(0) @map("average_rating")
+  favoriteCount   Int               @default(0) @map("favorite_count")
+
+  // SEO
+  metaTitle       String?           @map("meta_title")
+  metaDescription String?           @map("meta_description")
+
+  // Abonnement
+  subscriptionEndsAt DateTime?      @map("subscription_ends_at")
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  owner           User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  city            City              @relation(fields: [cityId], references: [id])
+  category        Category          @relation(fields: [categoryId], references: [id])
+  reviews         Review[]
+  favorites       Favorite[]
+
+  @@index([cityId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([subscriptionTier])
+  @@map("businesses")
+}
+
+// ============================================
+// AVIS & NOTES
+// ============================================
+
+model Review {
+  id          String    @id @default(cuid())
+  businessId  String    @map("business_id")
+  userId      String    @map("user_id")
+  rating      Int       // 1-5 étoiles
+  comment     String?
+  images      String[]  // Photos du client
+
+  // Réponse du propriétaire
+  response    String?
+  respondedAt DateTime? @map("responded_at")
+
+  // Modération
+  isVisible   Boolean   @default(true) @map("is_visible")
+  isReported  Boolean   @default(false) @map("is_reported")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, userId]) // Un user ne peut laisser qu'un avis par business
+  @@index([businessId])
+  @@index([userId])
+  @@map("reviews")
+}
+
+// ============================================
+// FAVORIS
+// ============================================
+
+model Favorite {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  businessId  String    @map("business_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([userId])
+  @@index([businessId])
+  @@map("favorites")
+}
+
+// ============================================
+// PAIEMENTS (Stripe)
+// ============================================
+
+model Payment {
+  id                String    @id @default(cuid())
+  userId            String    @map("user_id")
+  businessId        String?   @map("business_id")
+  stripePaymentId   String    @unique @map("stripe_payment_id")
+  amount            Int       // Montant en centimes
+  currency          String    @default("eur")
+  subscriptionTier  SubscriptionTier @map("subscription_tier")
+  status            String    // succeeded, pending, failed
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([businessId])
+  @@map("payments")
+}
