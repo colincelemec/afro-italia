@@ -1,96 +1,69 @@
-# 🌍 AfroItalia Platform v2.0 - Architecture Simplifiée
+# 🌍 AfroItalia Platform v2.0
 
-> Plateforme de découverte d'entreprises de la diaspora africaine en Italie
+> A discovery platform for African diaspora businesses in Italy
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
 ![React](https://img.shields.io/badge/react-18.2.0-blue)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-15-blue)
 
-## 📋 Table des matières
+## 🎯 Overview
 
-- [Vue d'ensemble](#vue-densemble)
-- [Stack technique](#stack-technique)
-- [Architecture](#architecture)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Démarrage](#démarrage)
-- [Structure du projet](#structure-du-projet)
-- [API Documentation](#api-documentation)
-- [Déploiement](#déploiement)
+AfroItalia Platform v2.0 is a complete rebuild on a simpler, faster stack.
 
----
+### Main features
 
-## 🎯 Vue d'ensemble
+**Authentication** — email/password sign-up and sign-in, JWT session management,
+optional Google OAuth.
 
-AfroItalia Platform v2.0 est une refonte complète utilisant une stack technique simplifiée et performante.
+**Business directory** — search by city and category, geolocation with Google
+Maps, detailed profiles with photos.
 
-### Fonctionnalités principales
+**Reviews** — ratings and comments, owner replies, moderation.
 
-✅ **Authentification**
-- Inscription/Connexion avec email/password
-- JWT pour la gestion des sessions
-- OAuth Google (optionnel)
+**Dashboard** — user dashboard, business management, statistics.
 
-✅ **Annuaire d'entreprises**
-- Recherche par ville et catégorie
-- Géolocalisation avec cartes Google Maps
-- Profils détaillés avec photos
+**Admin panel** — business verification, content moderation, analytics.
 
-✅ **Système de reviews**
-- Notes et commentaires
-- Réponses des propriétaires
-- Modération
-
-✅ **Dashboard**
-- Tableau de bord utilisateur
-- Gestion d'entreprises
-- Statistiques
-
-✅ **Panel Admin**
-- Vérification d'entreprises
-- Modération de contenu
-- Analytics
-
-✅ **Plans d'abonnement**
-- FREE, BASIC, PREMIUM
-- Paiements Stripe
+**Subscription plans** — FREE, BASIC and PREMIUM tiers with Stripe payments.
 
 ---
 
-## 🛠 Stack Technique
+## 🛠 Tech stack
 
-### Frontend
-- **React 18** - Bibliothèque UI
-- **React Router v6** - Navigation SPA
-- **JavaScript ES6+** - Pas de TypeScript
-- **CSS Modules** - Styles
-- **Fetch API** - Requêtes AJAX
-- **Zustand** - Gestion d'état (léger)
+### Front end
 
-### Backend
-- **Node.js** - Runtime
-- **Express.js** - Framework API REST
-- **Prisma ORM** - Accès base de données
-- **PostgreSQL** - Base de données principale
-- **PostGIS** - Extension géospatiale
-- **JWT** - Authentification
-- **Bcrypt** - Hash des mots de passe
+- **React 18** — UI library
+- **React Router v6** — SPA navigation
+- **JavaScript ES6+** — no TypeScript
+- **CSS Modules** — styling
+- **Fetch API** — AJAX requests
+- **Zustand** — lightweight state management
 
-### Services tiers
-- **Google Maps API** - Cartes et géolocalisation
-- **Stripe** - Paiements
-- **Nodemailer** - Emails
+### Back end
+
+- **Node.js** — runtime
+- **Express.js** — REST API framework
+- **Prisma ORM** — database access
+- **PostgreSQL** — primary database
+- **PostGIS** — geospatial extension
+- **JWT** — authentication
+- **Bcrypt** — password hashing
+
+### Third-party services
+
+- **Google Maps API** — maps and geolocation
+- **Stripe** — payments
+- **Nodemailer** — transactional email
 
 ### DevOps
-- **Docker** - Conteneurisation PostgreSQL
-- **Git** - Versioning
+
+- **Docker** — PostgreSQL containerisation
+- **Git** — version control
 
 ---
 
 ## 🏗 Architecture
-
-### Architecture globale
 
 ```
 ┌─────────────────┐         AJAX (Fetch)        ┌─────────────────┐
@@ -110,90 +83,86 @@ AfroItalia Platform v2.0 est une refonte complète utilisant une stack technique
                                                     └───────────┘
 ```
 
-### Flux de données
+### Data flow
 
-1. **User Action** → Interaction dans le navigateur (click, form submit)
-2. **AJAX Request** → Appel API via Fetch (services/api.js)
-3. **Express Route** → Route reçoit la requête
-4. **Controller** → Logique métier + validation
-5. **Prisma ORM** → Requête base de données
-6. **PostgreSQL** → Lecture/écriture données
-7. **JSON Response** → Réponse API au format JSON
-8. **UI Update** → React met à jour l'interface
+1. **User action** — interaction in the browser (click, form submit)
+2. **AJAX request** — API call through Fetch (`services/api.js`)
+3. **Express route** — the route receives the request
+4. **Controller** — business logic and validation
+5. **Prisma ORM** — database query
+6. **PostgreSQL** — read/write
+7. **JSON response** — API responds in JSON
+8. **UI update** — React updates the interface
 
 ---
 
 ## 📦 Installation
 
-### Prérequis
+### Requirements
 
 - **Node.js** ≥ 18.0.0
-- **PostgreSQL** ≥ 15 (ou Docker)
-- **npm** ou **pnpm**
+- **PostgreSQL** ≥ 15 (or Docker)
+- **npm** or **pnpm**
 
-### 1. Cloner le projet
+### 1. Clone the project
 
 ```bash
 git clone <repo-url>
 cd afro-italia-v2
 ```
 
-### 2. Installer les dépendances
+### 2. Install dependencies
 
-#### Backend
 ```bash
-cd server
-npm install
+cd server && npm install
+cd ../client && npm install
 ```
 
-#### Frontend
-```bash
-cd client
-npm install
-```
-
-### 3. Base de données avec Docker
+### 3. Database with Docker
 
 ```bash
-# À la racine du projet
+# from the project root
 docker-compose up -d
-
-# Vérifier que PostgreSQL fonctionne
-docker ps
+docker ps   # check PostgreSQL is running
 ```
 
-Accès :
-- **PostgreSQL** : `localhost:5432`
-- **pgAdmin** : `http://localhost:5050` (admin@afroitalia.com / admin123)
+Access:
+
+- **PostgreSQL** — `localhost:5432`
+- **pgAdmin** — `http://localhost:5050` (credentials are set in `docker-compose.yml`)
 
 ---
 
 ## ⚙️ Configuration
 
-### Backend (.env)
+> **⚠️ Never commit real credentials.** The `.env` files are gitignored; only
+> `.env.example` belongs in the repository, and it must contain placeholders
+> only. If a key is ever committed, rotate it — removing it later is not enough.
+
+### Back end
 
 ```bash
 cd server
 cp .env.example .env
 ```
 
-Éditer `.env` avec vos valeurs :
+Then fill in your own values:
 
 ```env
 # Database
-DATABASE_URL="postgresql://afroitalia:afroitalia123@localhost:5432/afroitalia_db"
+DATABASE_URL="postgresql://user:password@localhost:5432/afroitalia_db"
 
 # JWT
-JWT_SECRET=your-super-secret-key
+JWT_SECRET=your-jwt-secret-min-32-chars
 
 # Google Maps
 GOOGLE_MAPS_API_KEY=your-google-maps-key
 
 # Stripe
-STRIPE_SECRET_KEY=sk_test_xxx
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 ```
 
-### Frontend (.env)
+### Front end
 
 ```bash
 cd client
@@ -203,144 +172,132 @@ cp .env.example .env
 ```env
 REACT_APP_API_URL=http://localhost:5000/api
 REACT_APP_GOOGLE_MAPS_API_KEY=your-google-maps-key
-REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
 ```
 
 ---
 
-## 🚀 Démarrage
+## 🚀 Running the project
 
-### 1. Initialiser la base de données
+### 1. Initialise the database
 
 ```bash
 cd server
-
-# Générer le client Prisma
-npm run db:generate
-
-# Créer les tables (migrations)
-npm run db:migrate
-
-# Peupler avec des données de test
-npm run db:seed
+npm run db:generate   # generate the Prisma client
+npm run db:migrate    # create the tables
+npm run db:seed       # populate with test data
 ```
 
-### 2. Démarrer le backend
+### 2. Start the back end
 
 ```bash
 cd server
 npm run dev
 ```
 
-Le serveur démarre sur : **http://localhost:5000**
+Runs on **http://localhost:5000** — health check at `/health`.
 
-Test health check : **http://localhost:5000/health**
-
-### 3. Démarrer le frontend
+### 3. Start the front end
 
 ```bash
 cd client
 npm start
 ```
 
-L'application démarre sur : **http://localhost:3000**
+Runs on **http://localhost:3000**.
 
 ---
 
-## 📁 Structure du Projet
+## 📁 Project structure
 
 ```
-afro-italia-v2/
-├── client/                     # Frontend React
+.
+├── client/                     # React front end
 │   ├── src/
-│   │   ├── components/        # Composants réutilisables
-│   │   ├── pages/             # Pages de l'app
-│   │   ├── services/          # Services API (AJAX)
-│   │   │   ├── api.js         # Configuration Fetch
+│   │   ├── components/         # Reusable components
+│   │   ├── pages/              # Application pages
+│   │   ├── services/           # API services (AJAX)
+│   │   │   ├── api.js          # Fetch configuration
 │   │   │   └── businessService.js
-│   │   ├── context/           # Context API (état global)
-│   │   ├── hooks/             # Custom hooks
+│   │   ├── context/            # Context API (global state)
+│   │   ├── hooks/              # Custom hooks
 │   │   └── App.jsx
 │   └── package.json
 │
-├── server/                     # Backend Express
+├── server/                     # Express back end
 │   ├── src/
-│   │   ├── routes/            # Routes API REST
-│   │   ├── controllers/       # Logique métier
-│   │   ├── middleware/        # Middlewares (auth, validation)
-│   │   ├── services/          # Services (email, maps, etc.)
-│   │   ├── app.js             # Configuration Express
-│   │   └── server.js          # Entry point
+│   │   ├── routes/             # REST API routes
+│   │   ├── controllers/        # Business logic
+│   │   ├── middleware/         # Auth, validation
+│   │   ├── services/           # Email, maps, etc.
+│   │   ├── app.js              # Express configuration
+│   │   └── server.js           # Entry point
 │   ├── prisma/
-│   │   ├── schema.prisma      # Schéma DB
-│   │   └── seed.js            # Données de test
+│   │   ├── schema.prisma       # Database schema
+│   │   └── seed.js             # Test data
 │   └── package.json
 │
-├── database/                   # Scripts SQL
-│   └── schema.sql
-│
+├── database/                   # SQL scripts
 ├── docs/                       # Documentation
-│
 └── docker-compose.yml          # PostgreSQL + Redis
 ```
 
 ---
 
-## 📡 API Documentation
+## 📡 API documentation
 
-### Base URL
-```
-http://localhost:5000/api
-```
+Base URL: `http://localhost:5000/api`
 
-### Endpoints principaux
+### 🔐 Authentication
 
-#### 🔐 Authentification
-```
-POST   /api/auth/register      - Inscription
-POST   /api/auth/login         - Connexion
-POST   /api/auth/logout        - Déconnexion
-GET    /api/auth/me            - Profil utilisateur
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `POST` | `/api/auth/register` | Sign up |
+| `POST` | `/api/auth/login` | Sign in |
+| `POST` | `/api/auth/logout` | Sign out |
+| `GET` | `/api/auth/me` | Current user profile |
 
-#### 🏢 Entreprises
-```
-GET    /api/businesses              - Liste des entreprises
-GET    /api/businesses/search       - Recherche
-GET    /api/businesses/:slug        - Détails d'une entreprise
-POST   /api/businesses              - Créer (auth required)
-PUT    /api/businesses/:id          - Modifier (owner only)
-DELETE /api/businesses/:id          - Supprimer (owner/admin)
-POST   /api/businesses/:id/favorite - Toggle favoris (auth required)
-```
+### 🏢 Businesses
 
-#### ⭐ Reviews
-```
-GET    /api/reviews/:businessId     - Reviews d'une entreprise
-POST   /api/reviews                 - Créer un avis (auth required)
-PUT    /api/reviews/:id             - Modifier son avis
-DELETE /api/reviews/:id             - Supprimer son avis
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/businesses` | List businesses |
+| `GET` | `/api/businesses/search` | Search |
+| `GET` | `/api/businesses/:slug` | Business details |
+| `POST` | `/api/businesses` | Create (auth required) |
+| `PUT` | `/api/businesses/:id` | Update (owner only) |
+| `DELETE` | `/api/businesses/:id` | Delete (owner or admin) |
+| `POST` | `/api/businesses/:id/favorite` | Toggle favourite (auth required) |
 
-#### 👤 Utilisateurs
-```
-GET    /api/users/profile           - Mon profil
-PUT    /api/users/profile           - Modifier mon profil
-GET    /api/users/favorites         - Mes favoris
-GET    /api/users/my-businesses     - Mes entreprises
-```
+### ⭐ Reviews
 
-#### 🔧 Admin
-```
-GET    /api/admin/businesses        - Toutes les entreprises
-PATCH  /api/admin/businesses/:id/verify  - Vérifier une entreprise
-GET    /api/admin/stats             - Statistiques
-```
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/reviews/:businessId` | Reviews for a business |
+| `POST` | `/api/reviews` | Create a review (auth required) |
+| `PUT` | `/api/reviews/:id` | Update own review |
+| `DELETE` | `/api/reviews/:id` | Delete own review |
 
-### Exemple d'appel AJAX
+### 👤 Users
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/users/profile` | Own profile |
+| `PUT` | `/api/users/profile` | Update own profile |
+| `GET` | `/api/users/favorites` | Own favourites |
+| `GET` | `/api/users/my-businesses` | Own businesses |
+
+### 🔧 Admin
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/admin/businesses` | All businesses |
+| `PATCH` | `/api/admin/businesses/:id/verify` | Verify a business |
+| `GET` | `/api/admin/stats` | Statistics |
+
+### Example call
 
 ```javascript
-// Dans votre composant React
 import businessService from '../services/businessService';
 
 const fetchBusinesses = async () => {
@@ -352,105 +309,67 @@ const fetchBusinesses = async () => {
       category: 'restaurant'
     });
 
-    console.log(response.data); // Array d'entreprises
+    console.log(response.data); // array of businesses
   } catch (error) {
-    console.error('Erreur:', error.message);
+    console.error('Error:', error.message);
   }
 };
 ```
 
 ---
 
-## 🌐 Déploiement
+## 🌐 Deployment
 
-### Frontend (Netlify/Vercel)
+**Front end** (Netlify / Vercel)
 
 ```bash
 cd client
-npm run build
-
-# Le dossier build/ contient les fichiers statiques
+npm run build   # static files land in build/
 ```
 
-### Backend (Heroku/Railway/Render)
+**Back end** (Heroku / Railway / Render) — configure these environment variables:
+`DATABASE_URL`, `JWT_SECRET`, `GOOGLE_MAPS_API_KEY`, `STRIPE_SECRET_KEY`.
 
-```bash
-cd server
-
-# Variables d'environnement à configurer :
-# - DATABASE_URL
-# - JWT_SECRET
-# - GOOGLE_MAPS_API_KEY
-# - STRIPE_SECRET_KEY
-```
-
-### Base de données (Production)
-
-Utiliser un service PostgreSQL managé :
-- **Supabase** (gratuit jusqu'à 500 MB)
-- **Railway** (avec extension PostGIS)
-- **Neon** (serverless PostgreSQL)
-- **AWS RDS**
+**Database** — use a managed PostgreSQL service: Supabase (free up to 500 MB),
+Railway (with the PostGIS extension), Neon (serverless PostgreSQL) or AWS RDS.
 
 ---
 
 ## 🧪 Tests
 
 ```bash
-# Backend
-cd server
-npm test
-
-# Frontend
-cd client
-npm test
+cd server && npm test
+cd client && npm test
 ```
 
 ---
 
-## 📝 Migration depuis v1
+## 📝 Migrating from v1
 
-Si vous migrez depuis l'ancienne version (Next.js + Supabase) :
+If you are migrating from the previous version (Next.js + Supabase):
 
-1. **Exporter les données** de Supabase
-2. **Créer la nouvelle DB** PostgreSQL
-3. **Importer les données** avec les scripts de migration
-4. **Tester** l'API avec Postman
-5. **Déployer** progressivement
+1. Export the data from Supabase
+2. Create the new PostgreSQL database
+3. Import the data using the migration scripts
+4. Test the API with Postman
+5. Deploy progressively
 
-Documentation détaillée : `docs/MIGRATION.md`
-
----
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit (`git commit -m 'Add AmazingFeature'`)
-4. Push (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+See `docs/MIGRATION.md` for the detailed guide.
 
 ---
 
 ## 📄 Licence
 
-MIT License - voir le fichier `LICENSE`
+MIT — see the `LICENSE` file.
 
 ---
 
-## 👥 Équipe
+## 🔗 Useful links
 
-- **Développement** : AfroItalia Team
-- **Contact** : contact@afroitalia.com
-
----
-
-## 🔗 Liens utiles
-
-- [Documentation API complète](docs/API.md)
-- [Schéma de base de données](docs/DATABASE.md)
-- [Guide de déploiement](docs/DEPLOYMENT.md)
+- [Full API documentation](docs/API.md)
+- [Database schema](docs/DATABASE.md)
+- [Deployment guide](docs/DEPLOYMENT.md)
 
 ---
 
-**Bonne chance avec votre projet ! 🚀**
+**Author:** Colince Tcheussieu Mendji
