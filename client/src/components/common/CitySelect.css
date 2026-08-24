@@ -1,0 +1,138 @@
+/* ============================================
+   CitySelect — combobox città con ricerca
+   ============================================ */
+
+.cs {
+  position: relative;
+  width: 100%;
+}
+
+/* ── Campo (chiuso o barra di ricerca) ── */
+.cs-control {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 13px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cs-control:hover:not(:disabled) { border-color: var(--color-primary); }
+
+.cs-control:focus-visible,
+.cs--open .cs-control--input {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.cs-control:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.cs-control--err { border-color: var(--color-error); }
+
+.cs-control--placeholder .cs-control__label { color: var(--color-muted); }
+
+.cs-control__icon  { color: var(--color-primary); flex-shrink: 0; }
+.cs-control__label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cs-control__caret { color: var(--color-muted); flex-shrink: 0; }
+
+.cs-control--input { cursor: text; }
+
+/* ── Input di ricerca ── */
+.cs-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0;
+}
+
+.cs-input::placeholder { color: var(--color-muted); }
+
+.cs-clear {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  flex-shrink: 0;
+}
+
+.cs-clear:hover { color: var(--color-text); }
+
+/* ── Lista dei risultati ── */
+.cs-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  animation: cs-in 0.14s ease;
+}
+
+@keyframes cs-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cs-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  color: var(--color-text);
+}
+
+.cs-option.is-active { background: var(--color-primary-soft); }
+
+.cs-option.is-selected .cs-option__name {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.cs-option__name   { flex: 1; }
+.cs-option__region {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.cs-option__check  { color: var(--color-primary); flex-shrink: 0; }
+
+.cs-empty {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+/* Scrollbar discreta */
+.cs-list::-webkit-scrollbar { width: 8px; }
+.cs-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+}

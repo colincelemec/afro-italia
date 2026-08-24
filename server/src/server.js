@@ -2,11 +2,19 @@
 // Server Entry Point
 // ============================================
 
+require('dotenv').config();
+const { checkEnv } = require('./config/checkEnv');
+
+// Vérifie la configuration AVANT de charger l'app :
+// en production, un secret d'exemple interrompt le démarrage.
+checkEnv();
+
 const app = require('./app');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
+const HOST = '0.0.0.0'; // Requis par Railway/Render pour exposer le port
 
 // ============================================
 // DÉMARRAGE DU SERVEUR
@@ -19,14 +27,13 @@ const startServer = async () => {
     console.log('✅ Connecté à PostgreSQL via Prisma');
 
     // Démarrer le serveur
-    app.listen(PORT, () => {
+    app.listen(PORT, HOST, () => {
       console.log('');
       console.log('🚀 ============================================');
       console.log(`🚀 AfroItalia API Server`);
       console.log(`🚀 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🚀 Port: ${PORT}`);
-      console.log(`🚀 URL: http://localhost:${PORT}`);
-      console.log(`🚀 Health Check: http://localhost:${PORT}/health`);
+      console.log(`🚀 Health Check: /health`);
       console.log('🚀 ============================================');
       console.log('');
     });

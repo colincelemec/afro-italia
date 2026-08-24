@@ -15,70 +15,72 @@ async function main() {
   // ============================================
   console.log('📍 Création des villes...');
 
+  // NB: les slugs/noms sont en italien (canoniques dans toute l'app).
+  // La liste complète des 107 chefs-lieux est dans seeds/cities-italia.js.
   const cities = await Promise.all([
     prisma.city.upsert({
-      where: { slug: 'milan' },
+      where: { slug: 'milano' },
       update: {},
       create: {
-        name: 'Milan',
-        slug: 'milan',
+        name: 'Milano',
+        slug: 'milano',
         region: 'Lombardia',
         latitude: 45.4642,
         longitude: 9.1900,
         description: 'Capitale économique et mode de l\'Italie',
-        order: 1
-      }
-    }),
-    prisma.city.upsert({
-      where: { slug: 'rome' },
-      update: {},
-      create: {
-        name: 'Rome',
-        slug: 'rome',
-        region: 'Lazio',
-        latitude: 41.9028,
-        longitude: 12.4964,
-        description: 'Capitale de l\'Italie, ville historique',
         order: 2
       }
     }),
     prisma.city.upsert({
-      where: { slug: 'turin' },
+      where: { slug: 'roma' },
       update: {},
       create: {
-        name: 'Turin',
-        slug: 'turin',
+        name: 'Roma',
+        slug: 'roma',
+        region: 'Lazio',
+        latitude: 41.9028,
+        longitude: 12.4964,
+        description: 'Capitale de l\'Italie, ville historique',
+        order: 1
+      }
+    }),
+    prisma.city.upsert({
+      where: { slug: 'torino' },
+      update: {},
+      create: {
+        name: 'Torino',
+        slug: 'torino',
         region: 'Piemonte',
         latitude: 45.0703,
         longitude: 7.6869,
         description: 'Ville industrielle et culturelle',
-        order: 3
-      }
-    }),
-    prisma.city.upsert({
-      where: { slug: 'florence' },
-      update: {},
-      create: {
-        name: 'Florence',
-        slug: 'florence',
-        region: 'Toscana',
-        latitude: 43.7696,
-        longitude: 11.2558,
-        description: 'Berceau de la Renaissance',
         order: 4
       }
     }),
     prisma.city.upsert({
-      where: { slug: 'bologne' },
+      where: { slug: 'firenze' },
       update: {},
       create: {
-        name: 'Bologne',
-        slug: 'bologne',
+        name: 'Firenze',
+        slug: 'firenze',
+        region: 'Toscana',
+        latitude: 43.7696,
+        longitude: 11.2558,
+        description: 'Berceau de la Renaissance',
+        order: 8
+      }
+    }),
+    prisma.city.upsert({
+      where: { slug: 'bologna' },
+      update: {},
+      create: {
+        name: 'Bologna',
+        slug: 'bologna',
         region: 'Emilia-Romagna',
         latitude: 44.4949,
         longitude: 11.3426,
         description: 'Ville universitaire et gastronomique',
-        order: 5
+        order: 7
       }
     })
   ]);
@@ -166,14 +168,32 @@ async function main() {
   // ============================================
   console.log('👥 Création des utilisateurs...');
 
-  const hashedPassword = await bcrypt.hash('password123', 10);
+  // ── Sécurité ──
+  // Les comptes de démonstration ne doivent JAMAIS exister en production
+  // avec un mot de passe connu. On refuse de les créer si NODE_ENV=production
+  // sans mot de passe explicite.
+  const isProduction = process.env.NODE_ENV === 'production';
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || 'admin@afroitalia.com';
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+
+  if (isProduction && !adminPassword) {
+    console.error('\n❌ En production, définissez SEED_ADMIN_PASSWORD avant de lancer le seed.');
+    console.error('   Exemple : SEED_ADMIN_PASSWORD="…" npm run db:seed\n');
+    process.exit(1);
+  }
+
+  const demoPassword = 'password123';
+  const hashedPassword = await bcrypt.hash(demoPassword, 10);
+  const hashedAdminPassword = adminPassword
+    ? await bcrypt.hash(adminPassword, 10)
+    : hashedPassword;
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@afroitalia.com' },
+    where: { email: adminEmail },
     update: {},
     create: {
-      email: 'admin@afroitalia.com',
-      passwordHash: hashedPassword,
+      email: adminEmail,
+      passwordHash: hashedAdminPassword,
       firstName: 'Admin',
       lastName: 'AfroItalia',
       role: 'ADMIN',
@@ -181,40 +201,57 @@ async function main() {
     }
   });
 
-  const user1 = await prisma.user.upsert({
-    where: { email: 'john@example.com' },
-    update: {},
-    create: {
-      email: 'john@example.com',
-      passwordHash: hashedPassword,
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'USER',
-      isVerified: true
-    }
-  });
+  // ── Comptes de démonstration : jamais en production ──
+  let user1 = null;
+  let businessOwner = null;
 
-  const businessOwner = await prisma.user.upsert({
-    where: { email: 'owner@example.com' },
-    update: {},
-    create: {
-      email: 'owner@example.com',
-      passwordHash: hashedPassword,
-      firstName: 'Maria',
-      lastName: 'Rossi',
-      role: 'BUSINESS',
-      isVerified: true
-    }
-  });
+  if (!isProduction) {
+    user1 = await prisma.user.upsert({
+      where: { email: 'john@example.com' },
+      update: {},
+      create: {
+        email: 'john@example.com',
+        passwordHash: hashedPassword,
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'USER',
+        isVerified: true
+      }
+    });
 
-  console.log('✅ 3 utilisateurs créés (mot de passe: password123)\n');
-  console.log('   - admin@afroitalia.com (ADMIN)');
-  console.log('   - john@example.com (USER)');
-  console.log('   - owner@example.com (BUSINESS)\n');
+    businessOwner = await prisma.user.upsert({
+      where: { email: 'owner@example.com' },
+      update: {},
+      create: {
+        email: 'owner@example.com',
+        passwordHash: hashedPassword,
+        firstName: 'Maria',
+        lastName: 'Rossi',
+        role: 'BUSINESS',
+        isVerified: true
+      }
+    });
+
+    console.log(`✅ 3 utilisateurs créés (démo — mot de passe: ${demoPassword})\n`);
+    console.log(`   - ${adminEmail} (ADMIN)`);
+    console.log('   - john@example.com (USER)');
+    console.log('   - owner@example.com (BUSINESS)\n');
+  } else {
+    console.log(`✅ Compte administrateur créé : ${adminEmail}`);
+    console.log('   (comptes de démonstration ignorés en production)\n');
+  }
 
   // ============================================
-  // 4. ENTREPRISES
+  // 4. ENTREPRISES (données de démonstration)
   // ============================================
+  // En production on s'arrête ici : les vraies attività proviennent du
+  // recensement (prisma/seeds/businesses-reali.js), pas de fausses fiches.
+  if (isProduction) {
+    console.log('⏭️  Données de démonstration ignorées (production).');
+    console.log('   Lancez ensuite : npm run db:seed:cities && node prisma/seeds/businesses-reali.js\n');
+    return;
+  }
+
   console.log('🏢 Création des entreprises...');
 
   const business1 = await prisma.business.create({

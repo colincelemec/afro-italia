@@ -17,6 +17,7 @@ const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const metaRoutes = require('./routes/meta');
+const sitemapController = require('./controllers/sitemapController');
 
 // Import middlewares
 const errorHandler = require('./middleware/errorHandler');
@@ -29,12 +30,34 @@ const app = express();
 // MIDDLEWARES GLOBAUX
 // ============================================
 
+// Derrière un proxy (Railway, Render, Heroku, Nginx…) l'IP réelle du
+// visiteur est dans X-Forwarded-For. Sans ceci, express-rate-limit
+// voit l'IP du proxy et limite tout le monde ensemble (ou lève une erreur).
+app.set('trust proxy', 1);
+
 // Sécurité avec Helmet
 app.use(helmet());
 
-// CORS - Autoriser les requêtes depuis le client
+// ── CORS ──
+// Plusieurs origines possibles : domaine avec et sans www, previews Vercel…
+// CLIENT_URL accepte une liste séparée par des virgules.
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:3000')
+  .split(',')
+  .map(o => o.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Pas d'origine = appel serveur-à-serveur, curl, app mobile : autorisé
+    if (!origin) return callback(null, true);
+    const clean = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(clean)) return callback(null, true);
+    // Prévisualisations Vercel du même projet
+    if (/^https:\/\/[\w-]+\.vercel\.app$/.test(clean) && process.env.ALLOW_VERCEL_PREVIEWS === 'true') {
+      return callback(null, true);
+    }
+    return callback(new Error(`Origine non autorisée par le CORS : ${origin}`));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -61,6 +84,9 @@ app.use('/api/', limiter);
 // ============================================
 // HEALTH CHECK
 // ============================================
+
+// Sitemap XML pour les moteurs de recherche
+app.get('/sitemap.xml', sitemapController.getSitemap);
 
 app.get('/health', (req, res) => {
   res.status(200).json({

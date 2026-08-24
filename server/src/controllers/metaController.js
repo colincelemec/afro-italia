@@ -4,6 +4,7 @@
 // ============================================
 
 const { PrismaClient } = require('@prisma/client');
+const { devDetails } = require('../utils/errorResponse');
 const prisma = new PrismaClient();
 
 /**
@@ -31,7 +32,7 @@ exports.getCities = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des villes',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -60,7 +61,7 @@ exports.getCategories = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des catégories',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };

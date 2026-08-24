@@ -8,11 +8,17 @@ import Icon from '../components/common/Icon';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
 import '../styles/LandingPage.css';
 
 const LandingPage = () => {
   const { language } = useLanguage();
   const t = (path) => getTranslation(path, language);
+
+  usePageMeta({
+    title: t('landing.hero.title'),
+    description: t('landing.hero.description'),
+  });
 
   // ── Scroll-reveal in stile GitHub ──
   useEffect(() => {
@@ -61,6 +67,26 @@ const LandingPage = () => {
 
         <div className="hero-scroll-indicator" aria-hidden="true">
           <Icon name="arrowDown" size={22} />
+        </div>
+      </section>
+
+      {/* ════════ STATS BAND ════════ */}
+      <section className="stats-band">
+        <div className="container">
+          <div className="stats-band__grid">
+            {[
+              { icon: 'pin', value: '16', label: 'cities' },
+              { icon: 'grid', value: '6', label: 'categories' },
+              { icon: 'globe', value: '3', label: 'languages' },
+              { icon: 'heart', value: '100%', label: 'free' },
+            ].map((s) => (
+              <div className="stat-item gh-reveal" key={s.label}>
+                <div className="stat-item__icon"><Icon name={s.icon} size={20} /></div>
+                <span className="stat-item__value">{s.value}</span>
+                <span className="stat-item__label">{t(`landing.stats.${s.label}`)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -170,29 +196,13 @@ const LandingPage = () => {
             <h2 className="section-title">{t('landing.testimonials.title')}</h2>
           </div>
           <div className="testimonials-grid">
-            {[
-              {
-                text: "AfroItalia helped me discover amazing African restaurants in Milan I never knew existed. It's become my go-to platform!",
-                name: 'Amina K.',
-                role: 'Customer - Milano',
-              },
-              {
-                text: "Since joining AfroItalia, my hair salon's visibility has increased by 300%. The platform truly supports African businesses.",
-                name: 'Emmanuel O.',
-                role: 'Business Owner - Roma',
-              },
-              {
-                text: "Finally, a platform that celebrates our community! I've connected with so many entrepreneurs and customers through AfroItalia.",
-                name: 'Fatou D.',
-                role: 'Business Owner - Torino',
-              },
-            ].map((tm) => (
-              <div className="testimonial-card gh-card gh-reveal" key={tm.name}>
+            {['t1', 't2', 't3'].map((key) => (
+              <div className="testimonial-card gh-card gh-reveal" key={key}>
                 <div className="testimonial-quote" aria-hidden="true">"</div>
-                <p className="testimonial-text">{tm.text}</p>
+                <p className="testimonial-text">{t(`landing.testimonials.${key}.text`)}</p>
                 <div className="testimonial-author">
-                  <strong>{tm.name}</strong>
-                  <span>{tm.role}</span>
+                  <strong>{t(`landing.testimonials.${key}.name`)}</strong>
+                  <span>{t(`landing.testimonials.${key}.role`)}</span>
                 </div>
               </div>
             ))}

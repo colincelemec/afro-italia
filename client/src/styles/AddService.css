@@ -105,6 +105,55 @@ select.as-input { cursor: pointer; }
 }
 .as-map .leaflet-container { height: 100%; width: 100%; }
 
+/* ──────── Stato ricerca indirizzo (geocoding) ──────── */
+.as-geo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  margin-bottom: .8rem;
+  border-radius: 10px;
+  font-size: .86rem;
+  line-height: 1.45;
+}
+
+.as-geo--searching {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.as-geo--found {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.as-geo--notfound,
+.as-geo--error {
+  background: var(--color-error-soft);
+  color: var(--color-error);
+}
+
+.as-geo .ai-icon { flex-shrink: 0; }
+
+/* Spinner della ricerca */
+.as-geo__spinner {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: as-geo-spin 0.7s linear infinite;
+}
+
+@keyframes as-geo-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .as-geo__spinner { animation-duration: 2s; }
+}
+
 /* ──────── AZIONI ──────── */
 .as-actions {
   display: flex;

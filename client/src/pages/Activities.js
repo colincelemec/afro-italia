@@ -12,6 +12,8 @@ import 'leaflet/dist/leaflet.css';
 import api from '../services/api';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
+import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
 import '../styles/Activities.css';
 
@@ -36,13 +38,8 @@ const CATEGORIES = [
   { slug: 'service',    labelKey: 'app.activities.catServices',    icon: 'servizi' },
 ];
 
+// Le città arrivano dal database (/api/meta/cities): tutti i capoluoghi.
 const ALL_CITIES = 'ALL';
-const CITIES = [
-  ALL_CITIES,
-  'Roma', 'Milano', 'Napoli', 'Torino', 'Firenze', 'Bologna', 'Palermo',
-  'Genova', 'Verona', 'Padova', 'Bergamo', 'Venezia', 'Catania', 'Bari',
-  'Parma', 'Cagliari',
-];
 
 const SORTS = [
   { value: 'rating',  labelKey: 'app.activities.sortRating' },
@@ -53,7 +50,7 @@ const SORTS = [
 const PAGE_SIZE = 12;
 
 const Stars = ({ value }) => (
-  <span className="act-stars" aria-label={`${value} su 5`}>
+  <span className="act-stars" aria-label={`${value} / 5`}>
     {[1, 2, 3, 4, 5].map(i => (
       <Icon key={i} name="star" size={14} className={i <= Math.round(value) ? 'on' : 'off'} />
     ))}
@@ -77,6 +74,11 @@ const Activities = () => {
   const { language } = useLanguage();
   const t = useCallback((path) => getTranslation(path, language), [language]);
 
+  usePageMeta({
+    title: getTranslation('app.activities.heroTitle', language),
+    description: getTranslation('app.activities.heroSubtitle', language),
+  });
+
   const [businesses, setBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -85,7 +87,9 @@ const Activities = () => {
   const [pagination, setPagination] = useState({ totalPages: 1, total: 0 });
 
   const [category, setCategory] = useState('all');
-  const [city, setCity] = useState(CITIES[0]);
+  // `city` contiene lo slug della città (es. 'reggio-calabria') o ALL_CITIES
+  const [city, setCity] = useState(ALL_CITIES);
+  const [cities, setCities] = useState([]);
   const [sort, setSort] = useState('rating');
   const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
@@ -96,6 +100,20 @@ const Activities = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [showSuggest, setShowSuggest] = useState(false);
   const [activeSuggest, setActiveSuggest] = useState(-1);
+
+  // ── Città dal database (tutti i capoluoghi di provincia) ──
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await api.get('/meta/cities');
+        if (active) setCities(res.data?.cities || []);
+      } catch {
+        if (active) setCities([]);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   // ── Debounce ricerca ──
   useEffect(() => {
@@ -134,7 +152,7 @@ const Activities = () => {
     try {
       const params = { page: pg, limit: PAGE_SIZE };
       if (category !== 'all') params.category = category;
-      if (city !== CITIES[0]) params.city = city.toLowerCase();
+      if (city !== ALL_CITIES) params.city = city; // `city` è già lo slug
 
       const res = await api.get('/businesses', params);
       const data = res.data || [];
@@ -188,11 +206,17 @@ const Activities = () => {
 
   const mappable = useMemo(() => visible.filter(b => b.latitude && b.longitude), [visible]);
 
-  const hasActiveFilters = category !== 'all' || city !== CITIES[0] || search;
+  // Nome leggibile della città selezionata (lo stato contiene lo slug)
+  const cityName = useMemo(
+    () => cities.find(c => c.slug === city)?.name || city,
+    [cities, city]
+  );
+
+  const hasActiveFilters = category !== 'all' || city !== ALL_CITIES || search;
 
   const resetFilters = () => {
     setCategory('all');
-    setCity(CITIES[0]);
+    setCity(ALL_CITIES);
     setSearchInput('');
     setSort('rating');
   };
@@ -261,11 +285,8 @@ const Activities = () => {
     }
   };
 
-  // Nome categoria tradotto (fallback: nome dal database)
-  const catLabel = (b) => {
-    const c = CATEGORIES.find(c => c.slug === b.category?.slug);
-    return c ? t(c.labelKey) : b.category?.name;
-  };
+  // Nome categoria tradotto — implementazione condivisa (utils/categoryLabel)
+  const catLabel = (b) => getCategoryLabel(b.category, language);
 
   return (
     <div className="act">
@@ -291,10 +312,10 @@ const Activities = () => {
               aria-expanded={showSuggest && suggestions.length > 0}
               aria-autocomplete="list"
               aria-controls="act-suggest-list"
-              aria-label="Cerca un'attività"
+              aria-label={t('app.activities.a11ySearch')}
             />
             {searchInput && (
-              <button className="act-searchbar__clear" onClick={() => { setSearchInput(''); setShowSuggest(false); }} aria-label="Cancella ricerca">✕</button>
+              <button className="act-searchbar__clear" onClick={() => { setSearchInput(''); setShowSuggest(false); }} aria-label={t('app.activities.a11yClearSearch')}>✕</button>
             )}
 
             {/* ── Dropdown suggerimenti ── */}
@@ -334,10 +355,10 @@ const Activities = () => {
             <div className="act-board-head">
               <h2>{t('app.activities.featured')}</h2>
               <div className="act-board-nav">
-                <button onClick={() => scrollBoard(-1)} aria-label="Scorri a sinistra">
+                <button onClick={() => scrollBoard(-1)} aria-label={t('app.activities.a11yScrollLeft')}>
                   <Icon name="arrowL" size={16} />
                 </button>
-                <button onClick={() => scrollBoard(1)} aria-label="Scorri a destra">
+                <button onClick={() => scrollBoard(1)} aria-label={t('app.activities.a11yScrollRight')}>
                   <Icon name="arrowR" size={16} />
                 </button>
               </div>
@@ -387,7 +408,7 @@ const Activities = () => {
       {/* ════════ BARRA FILTRI (sticky) ════════ */}
       <div className="act-filterbar">
         <div className="act-container act-filterbar__inner">
-          <div className="act-pills" role="tablist" aria-label="Categorie">
+          <div className="act-pills" role="tablist" aria-label={t('app.activities.a11yCategories')}>
             {CATEGORIES.map(c => (
               <button
                 key={c.slug}
@@ -402,26 +423,29 @@ const Activities = () => {
           </div>
 
           <div className="act-selects">
-            <select value={city} onChange={e => setCity(e.target.value)} aria-label="Filtra per città">
-              {CITIES.map(c => <option key={c} value={c}>{c === ALL_CITIES ? t('app.activities.allCities') : c}</option>)}
+            <select value={city} onChange={e => setCity(e.target.value)} aria-label={t('app.activities.a11yFilterCity')}>
+              <option value={ALL_CITIES}>{t('app.activities.allCities')}</option>
+              {cities.map(c => (
+                <option key={c.id} value={c.slug}>{c.name}</option>
+              ))}
             </select>
-            <select value={sort} onChange={e => setSort(e.target.value)} aria-label="Ordina per">
+            <select value={sort} onChange={e => setSort(e.target.value)} aria-label={t('app.activities.a11ySortBy')}>
               {SORTS.map(s => <option key={s.value} value={s.value}>{t(s.labelKey)}</option>)}
             </select>
 
             {/* Toggle griglia / mappa */}
-            <div className="act-viewtoggle" role="group" aria-label="Modalità di visualizzazione">
+            <div className="act-viewtoggle" role="group" aria-label={t('app.activities.a11yViewMode')}>
               <button
                 className={view === 'grid' ? 'active' : ''}
                 onClick={() => setView('grid')}
-                aria-label="Vista griglia"
+                aria-label={t('app.activities.a11yGridView')}
               >
                 <Icon name="grid" size={15} /> {t('app.activities.viewGrid')}
               </button>
               <button
                 className={view === 'map' ? 'active' : ''}
                 onClick={() => setView('map')}
-                aria-label="Vista mappa"
+                aria-label={t('app.activities.a11yMapView')}
               >
                 <Icon name="map" size={15} /> {t('app.activities.viewMap')}
               </button>
@@ -438,7 +462,7 @@ const Activities = () => {
             <span>
               <strong>{search ? visible.length : pagination.total || visible.length}</strong> {t('app.activities.results')}
               {category !== 'all' && <> {t('app.activities.resultsIn')} <strong>{t(CATEGORIES.find(c => c.slug === category)?.labelKey)}</strong></>}
-              {city !== CITIES[0] && <> {t('app.activities.resultsAt')} <strong>{city}</strong></>}
+              {city !== ALL_CITIES && <> {t('app.activities.resultsAt')} <strong>{cityName}</strong></>}
               {view === 'map' && <> · <strong>{mappable.length}</strong> {t('app.activities.onTheMap')}</>}
             </span>
           )}
@@ -495,7 +519,7 @@ const Activities = () => {
                 className="act-slider__arrow act-slider__arrow--left"
                 onClick={() => scrollList(-1)}
                 disabled={!canScroll.left}
-                aria-label="Scorri a sinistra"
+                aria-label={t('app.activities.a11yScrollLeft')}
               >
                 <Icon name="arrowL" size={22} />
               </button>
@@ -551,7 +575,7 @@ const Activities = () => {
                 className="act-slider__arrow act-slider__arrow--right"
                 onClick={() => scrollList(1)}
                 disabled={!canScroll.right}
-                aria-label="Scorri a destra"
+                aria-label={t('app.activities.a11yScrollRight')}
               >
                 <Icon name="arrowR" size={22} />
               </button>

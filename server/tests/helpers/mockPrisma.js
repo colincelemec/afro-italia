@@ -9,7 +9,9 @@ const modelMethods = () => ({
   findFirst: jest.fn(),
   findMany: jest.fn(),
   create: jest.fn(),
+  createMany: jest.fn(),
   update: jest.fn(),
+  updateMany: jest.fn(),
   upsert: jest.fn(),
   delete: jest.fn(),
   deleteMany: jest.fn(),
@@ -25,7 +27,7 @@ const mockPrisma = {
   city: modelMethods(),
   category: modelMethods(),
   favorite: modelMethods(),
-  payment: modelMethods(),
+  businessClaim: modelMethods(),
   $transaction: jest.fn((ops) => Promise.all(ops)),
   $disconnect: jest.fn(),
 };

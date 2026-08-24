@@ -39,6 +39,10 @@
   --radius-lg: 14px;
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
 
+  /* Skeleton / shimmer (caricamento) */
+  --skeleton-base: #161b22;
+  --skeleton-shine: #21262d;
+
   color-scheme: dark;
 }
 
@@ -70,6 +74,10 @@
   --color-error-soft: #fbe9e7;
 
   --shadow: 0 8px 24px rgba(45, 33, 24, 0.08);
+
+  /* Skeleton / shimmer sul chiaro */
+  --skeleton-base: #ece6de;
+  --skeleton-shine: #f6f2ec;
 
   color-scheme: light;
 }

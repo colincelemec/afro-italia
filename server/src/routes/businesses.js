@@ -5,8 +5,9 @@
 const express = require('express');
 const router = express.Router();
 const businessController = require('../controllers/businessController');
+const claimController = require('../controllers/claimController');
 const { protect, restrictTo } = require('../middleware/auth');
-const { validateBusiness } = require('../middleware/validation');
+const { validateBusiness, validateClaim } = require('../middleware/validation');
 
 // ============================================
 // ROUTES PUBLIQUES
@@ -41,6 +42,18 @@ router.get('/:id/reviews', businessController.getBusinessReviews);
 // ============================================
 // ROUTES PROTÉGÉES (Authentification requise)
 // ============================================
+
+/**
+ * POST /api/businesses/:id/claim
+ * Revendiquer la propriété d'une fiche (« C'est mon activité »)
+ */
+router.post('/:id/claim', protect, validateClaim, claimController.createClaim);
+
+/**
+ * GET /api/businesses/:id/claim/me
+ * Statut de ma revendication sur cette fiche
+ */
+router.get('/:id/claim/me', protect, claimController.getMyClaim);
 
 /**
  * POST /api/businesses

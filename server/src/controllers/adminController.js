@@ -3,6 +3,7 @@
 // ============================================
 
 const { PrismaClient } = require('@prisma/client');
+const { devDetails } = require('../utils/errorResponse');
 const prisma = new PrismaClient();
 
 /**
@@ -84,7 +85,7 @@ exports.getStats = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des statistiques',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -145,7 +146,7 @@ exports.getAllBusinesses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des entreprises',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -184,7 +185,7 @@ exports.getPendingBusinesses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des entreprises en attente',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -250,7 +251,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des utilisateurs',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -315,7 +316,7 @@ exports.updateUserRole = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour du rôle',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -358,7 +359,7 @@ exports.getReportedReviews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des avis signalés',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -416,7 +417,7 @@ exports.deleteReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression de l\'avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -462,7 +463,7 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression de l\'utilisateur',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };

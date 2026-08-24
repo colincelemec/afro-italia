@@ -7,7 +7,14 @@ const rateLimit = require('express-rate-limit');
 // In sviluppo i limiti vengono disattivati: il dev mode di React
 // (StrictMode raddoppia le richieste) e i reload esauriscono subito
 // le 100 richieste/15min, bloccando anche il login.
-const isDev = process.env.NODE_ENV !== 'production';
+//
+// IMPORTANTE — sicurezza: il limite si disattiva SOLO se NODE_ENV vale
+// esplicitamente 'development' o 'test'. Se la variabile manca (caso
+// frequente in produzione), la protezione resta ATTIVA.
+// Prima bastava dimenticare NODE_ENV=production per lasciare il login
+// senza alcuna protezione contro gli attacchi a forza bruta.
+const env = process.env.NODE_ENV;
+const isDev = env === 'development' || env === 'test';
 
 // Rate limiter global pour toutes les routes API
 const limiter = rateLimit({

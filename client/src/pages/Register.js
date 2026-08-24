@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import PasswordInput from '../components/common/PasswordInput';
 import useAuthStore from '../stores/authStore';
 import '../styles/Auth.css';
 
@@ -156,14 +157,16 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="password">{t('register.passwordLabel')}</label>
-            <input
-              type="password"
+            <PasswordInput
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               className={formErrors.password ? 'error' : ''}
               placeholder={t('register.passwordPlaceholder')}
+              autoComplete="new-password"
+              showLabel={getTranslation('common.showPassword', language)}
+              hideLabel={getTranslation('common.hidePassword', language)}
             />
             {formErrors.password && (
               <span className="field-error">{formErrors.password}</span>
@@ -172,14 +175,16 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="confirmPassword">{t('register.confirmPasswordLabel')}</label>
-            <input
-              type="password"
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
               className={formErrors.confirmPassword ? 'error' : ''}
               placeholder={t('register.confirmPasswordPlaceholder')}
+              autoComplete="new-password"
+              showLabel={getTranslation('common.showPassword', language)}
+              hideLabel={getTranslation('common.hidePassword', language)}
             />
             {formErrors.confirmPassword && (
               <span className="field-error">{formErrors.confirmPassword}</span>

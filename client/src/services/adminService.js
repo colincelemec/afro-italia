@@ -40,6 +40,16 @@ const adminService = {
   // ── Avis signalés (modération) ──
   getReportedReviews: () => api.get('/admin/reviews/reported'),
   deleteReview: (id) => api.delete(`/admin/reviews/${id}`),
+
+  // ── Revendications de fiches (« C'est mon activité ») ──
+  getClaims: (params = {}) => api.get('/admin/claims', params),
+
+  /**
+   * Approuver ou refuser une revendication
+   * status: 'APPROVED' | 'REJECTED'
+   */
+  reviewClaim: (id, status, adminNote) =>
+    api.patch(`/admin/claims/${id}`, { status, adminNote }),
 };
 
 export default adminService;

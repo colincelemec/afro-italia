@@ -1,0 +1,20 @@
+# ============================================
+# AfroItalia — robots.txt
+# ============================================
+
+User-agent: *
+Allow: /
+
+# Pages privées : inutiles pour les moteurs de recherche
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /add-service
+Disallow: /add-business
+Disallow: /edit-service/
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Le sitemap est généré dynamiquement par l'API
+# (remplacez par votre domaine réel après le déploiement)
+Sitemap: https://afroitalia.com/sitemap.xml

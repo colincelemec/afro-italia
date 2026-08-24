@@ -63,6 +63,12 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/legal/:type" element={<LegalPage />} />
 
+              {/* Annuaire public : indispensable pour le référencement (SEO),
+                  le partage sur les réseaux et pour qu'un propriétaire puisse
+                  voir sa fiche avant de créer un compte. */}
+              <Route path="/activities" element={<Activities />} />
+              <Route path="/businesses/:slug" element={<BusinessDetail />} />
+
               {/* Protected Routes */}
               <Route
                 path="/dashboard"
@@ -80,23 +86,6 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/activities"
-                element={
-                  <ProtectedRoute>
-                    <Activities />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/businesses/:slug"
-                element={
-                  <ProtectedRoute>
-                    <BusinessDetail />
-                  </ProtectedRoute>
-                }
-              />
-
               {/* Pubblica un servizio/attività - qualunque utente autenticato */}
               <Route
                 path="/add-service"

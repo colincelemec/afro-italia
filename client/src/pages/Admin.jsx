@@ -9,6 +9,8 @@ import adminService from '../services/adminService';
 import useAuthStore from '../stores/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
+import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import '../styles/Admin.css';
@@ -32,11 +34,14 @@ const Admin = () => {
   const { language } = useLanguage();
   const t = (path) => getTranslation(path, language);
 
+  usePageMeta({ title: t('app.nav.admin'), noIndex: true });
+
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState(null);
   const [businesses, setBusinesses] = useState([]);
   const [users, setUsers] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [claims, setClaims] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -75,6 +80,13 @@ const Admin = () => {
     } catch (e) { setError(e.message); }
   }, [userSearch]);
 
+  const loadClaims = useCallback(async () => {
+    try {
+      const res = await adminService.getClaims();
+      setClaims(res.data?.claims || []);
+    } catch (e) { setError(e.message); }
+  }, []);
+
   const loadReviews = useCallback(async () => {
     try {
       const res = await adminService.getReportedReviews();
@@ -86,7 +98,7 @@ const Admin = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      await Promise.allSettled([loadStats(), loadBusinesses(), loadUsers(), loadReviews()]);
+      await Promise.allSettled([loadStats(), loadBusinesses(), loadUsers(), loadReviews(), loadClaims()]);
       setLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -124,6 +136,19 @@ const Admin = () => {
     },
   });
 
+  // ── Azioni richieste di rivendicazione ──
+  const askReviewClaim = (claim, status) => setDialog({
+    title: t(status === 'APPROVED' ? 'app.admin.claimApproveTitle' : 'app.admin.claimRejectTitle'),
+    message: `${t(status === 'APPROVED' ? 'app.admin.claimApproveMsg' : 'app.admin.claimRejectMsg')} — ${claim.business?.name}`,
+    onConfirm: async () => {
+      setDialog(null);
+      try {
+        await adminService.reviewClaim(claim.id, status);
+        await Promise.all([loadClaims(), loadBusinesses(), loadStats()]);
+      } catch (e) { setError(e.message); }
+    },
+  });
+
   // ── Azioni recensioni ──
   const askDeleteReview = (r) => setDialog({
     title: t('app.admin.confirmDeleteReviewTitle'),
@@ -146,6 +171,7 @@ const Admin = () => {
     { id: 'businesses', label: t('app.admin.tabBusinesses'), icon: 'store', count: businesses.length },
     { id: 'users',      label: t('app.admin.tabUsers'),      icon: 'users', count: users.length },
     { id: 'reviews',    label: t('app.admin.tabReviews'),    icon: 'flag',  count: reviews.length },
+    { id: 'claims',     label: t('app.admin.tabClaims'),     icon: 'shield', count: claims.filter(c => c.status === 'PENDING').length },
   ];
 
   // ════════ OVERVIEW ════════
@@ -231,7 +257,7 @@ const Admin = () => {
                   <tr key={b.id}>
                     <td data-label={t('app.admin.colName')}>
                       <strong>{b.name}</strong>
-                      <span className="ad-sub">{b.category?.name}</span>
+                      <span className="ad-sub">{getCategoryLabel(b.category, language)}</span>
                     </td>
                     <td data-label={t('app.admin.colOwner')}>
                       {fullName(b.owner)}
@@ -358,6 +384,70 @@ const Admin = () => {
     </>
   );
 
+  // ════════ RICHIESTE DI RIVENDICAZIONE ════════
+  const renderClaims = () => (
+    claims.length === 0 ? (
+      <div className="ad-empty"><Icon name="shield" size={32} /><p>{t('app.admin.noClaims')}</p></div>
+    ) : (
+      <ul className="ad-claims">
+        {claims.map(c => (
+          <li key={c.id} className={`ad-claim ad-claim--${c.status.toLowerCase()}`}>
+            <div className="ad-claim__main">
+              <div className="ad-claim__head">
+                <strong>{c.business?.name}</strong>
+                <span className="ad-sub">{c.business?.city?.name}</span>
+                <span className={`ad-badge ad-badge--${c.status === 'PENDING' ? 'pending' : c.status === 'APPROVED' ? 'verified' : 'rejected'}`}>
+                  {t(`app.admin.claimStatus_${c.status}`)}
+                </span>
+              </div>
+
+              <div className="ad-claim__grid">
+                <div>
+                  <span className="ad-claim__label">{t('app.admin.claimRequester')}</span>
+                  <strong>{c.fullName}</strong>
+                  <span className="ad-sub">{c.user?.email}</span>
+                </div>
+                <div>
+                  <span className="ad-claim__label">{t('app.admin.claimRole')}</span>
+                  <strong>{c.role}</strong>
+                </div>
+                <div>
+                  <span className="ad-claim__label">{t('app.admin.colActions')}</span>
+                  <a href={`tel:${c.phone}`} className="ad-claim__link">{c.phone}</a>
+                  <a href={`mailto:${c.email}`} className="ad-claim__link">{c.email}</a>
+                </div>
+                <div>
+                  <span className="ad-claim__label">{t('app.admin.colCreated')}</span>
+                  <strong>{fmtDate(c.createdAt)}</strong>
+                </div>
+              </div>
+
+              {c.message && (
+                <p className="ad-claim__message">
+                  <span className="ad-claim__label">{t('app.admin.claimMessage')}</span>
+                  “{c.message}”
+                </p>
+              )}
+            </div>
+
+            {c.status === 'PENDING' && (
+              <div className="ad-claim__actions">
+                <button className="ad-btn ad-btn--ok" title={t('app.admin.claimApprove')}
+                  onClick={() => askReviewClaim(c, 'APPROVED')}>
+                  <Icon name="check" size={14} /> {t('app.admin.claimApprove')}
+                </button>
+                <button className="ad-btn ad-btn--danger" title={t('app.admin.claimReject')}
+                  onClick={() => askReviewClaim(c, 'REJECTED')}>
+                  <Icon name="ban" size={14} /> {t('app.admin.claimReject')}
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    )
+  );
+
   // ════════ REPORTED REVIEWS ════════
   const renderReviews = () => (
     reviews.length === 0 ? (
@@ -428,6 +518,7 @@ const Admin = () => {
           ) : activeTab === 'overview' ? renderOverview()
             : activeTab === 'businesses' ? renderBusinesses()
             : activeTab === 'users' ? renderUsers()
+            : activeTab === 'claims' ? renderClaims()
             : renderReviews()}
         </section>
       </div>

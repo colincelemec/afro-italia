@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import PasswordInput from '../components/common/PasswordInput';
 import authService from '../services/authService';
 import '../styles/Auth.css';
 
@@ -95,28 +96,32 @@ const ResetPassword = () => {
 
             <div className="form-group">
               <label htmlFor="password">{t('resetPwd.newPassword')}</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="password"
                 name="password"
                 value={form.password}
                 onChange={handleChange}
                 className={errors.password ? 'error' : ''}
                 placeholder={t('resetPwd.newPasswordPh')}
+                autoComplete="new-password"
+                showLabel={getTranslation('common.showPassword', language)}
+                hideLabel={getTranslation('common.hidePassword', language)}
               />
               {errors.password && <span className="field-error">{errors.password}</span>}
             </div>
 
             <div className="form-group">
               <label htmlFor="confirmPassword">{t('resetPwd.confirmPassword')}</label>
-              <input
-                type="password"
+              <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
                 value={form.confirmPassword}
                 onChange={handleChange}
                 className={errors.confirmPassword ? 'error' : ''}
                 placeholder={t('resetPwd.confirmPasswordPh')}
+                autoComplete="new-password"
+                showLabel={getTranslation('common.showPassword', language)}
+                hideLabel={getTranslation('common.hidePassword', language)}
               />
               {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
             </div>

@@ -1,375 +1,144 @@
-# 🌍 AfroItalia Platform v2.0
+# 🌍 AfroItalia
 
-> A discovery platform for African diaspora businesses in Italy
+> A directory of African diaspora businesses in Italy — restaurants,
+> hairdressers, grocery stores, fashion, beauty and services.
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
-![React](https://img.shields.io/badge/react-18.2.0-blue)
+![React](https://img.shields.io/badge/react-18-blue)
+![Node](https://img.shields.io/badge/node-%3E%3D18-green)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-15-blue)
-
-## 🎯 Overview
-
-AfroItalia Platform v2.0 is a complete rebuild on a simpler, faster stack.
-
-### Main features
-
-**Authentication** — email/password sign-up and sign-in, JWT session management,
-optional Google OAuth.
-
-**Business directory** — search by city and category, geolocation with Google
-Maps, detailed profiles with photos.
-
-**Reviews** — ratings and comments, owner replies, moderation.
-
-**Dashboard** — user dashboard, business management, statistics.
-
-**Admin panel** — business verification, content moderation, analytics.
-
-**Subscription plans** — FREE, BASIC and PREMIUM tiers with Stripe payments.
+![Tests](https://img.shields.io/badge/tests-62%20passing-brightgreen)
+![i18n](https://img.shields.io/badge/languages-IT%20·%20FR%20·%20EN-orange)
 
 ---
 
-## 🛠 Tech stack
+## What it does
 
-### Front end
+Visitors search businesses by city and category, read reviews and open a
+detail page with photos, opening hours and an interactive map — **without
+needing an account**.
 
-- **React 18** — UI library
-- **React Router v6** — SPA navigation
-- **JavaScript ES6+** — no TypeScript
-- **CSS Modules** — styling
-- **Fetch API** — AJAX requests
-- **Zustand** — lightweight state management
+Registered users save favourites, write reviews and publish their own
+business. Owners of listings created from our community census can **claim**
+them. Administrators verify submissions, moderate reviews and approve claims.
 
-### Back end
-
-- **Node.js** — runtime
-- **Express.js** — REST API framework
-- **Prisma ORM** — database access
-- **PostgreSQL** — primary database
-- **PostGIS** — geospatial extension
-- **JWT** — authentication
-- **Bcrypt** — password hashing
-
-### Third-party services
-
-- **Google Maps API** — maps and geolocation
-- **Stripe** — payments
-- **Nodemailer** — transactional email
-
-### DevOps
-
-- **Docker** — PostgreSQL containerisation
-- **Git** — version control
+Everything is available in **Italian, French and English**, in a dark or light
+theme.
 
 ---
 
-## 🏗 Architecture
+## Features
 
-```
-┌─────────────────┐         AJAX (Fetch)        ┌─────────────────┐
-│                 │ ◄──────────────────────────► │                 │
-│  React SPA      │      JSON REST API          │   Express API   │
-│  (Port 3000)    │                              │   (Port 5000)   │
-│                 │                              │                 │
-└─────────────────┘                              └────────┬────────┘
-                                                          │
-                                                          │ Prisma ORM
-                                                          │
-                                                    ┌─────▼─────┐
-                                                    │           │
-                                                    │ PostgreSQL│
-                                                    │ + PostGIS │
-                                                    │           │
-                                                    └───────────┘
-```
+**Directory** — search with autocomplete, filters by city (107 Italian
+provincial capitals) and category, grid and map views, pagination.
 
-### Data flow
+**Business pages** — photo gallery, contact details, opening hours, social
+links, reviews with owner replies, Leaflet map, share buttons (WhatsApp,
+Facebook, email, copy link).
 
-1. **User action** — interaction in the browser (click, form submit)
-2. **AJAX request** — API call through Fetch (`services/api.js`)
-3. **Express route** — the route receives the request
-4. **Controller** — business logic and validation
-5. **Prisma ORM** — database query
-6. **PostgreSQL** — read/write
-7. **JSON response** — API responds in JSON
-8. **UI update** — React updates the interface
+**Publishing** — a guided form where typing an address automatically places the
+map pin (geocoding via OpenStreetMap), with an international phone field
+covering ~245 countries.
+
+**Accounts** — email/password or Google sign-in, password reset, favourites,
+personal dashboard.
+
+**Administration** — statistics, business moderation, user management,
+reported-review moderation, ownership-claim approval.
+
+**Support chatbot** — nine predefined questions and answers in three
+languages, no external AI service.
 
 ---
 
-## 📦 Installation
+## Tech stack
 
-### Requirements
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, React Router 6, Zustand, Leaflet, plain CSS with variables |
+| Backend | Node.js, Express, Prisma ORM |
+| Database | PostgreSQL 15 |
+| Auth | JWT + Google OAuth 2.0 |
+| Emails | Nodemailer (SMTP) |
+| Tests | Jest + Supertest — 62 tests, no database required |
+| Hosting | Vercel (frontend) + Railway (API and database) |
 
-- **Node.js** ≥ 18.0.0
-- **PostgreSQL** ≥ 15 (or Docker)
-- **npm** or **pnpm**
+---
 
-### 1. Clone the project
+## Quick start
+
+**Requirements:** Node.js 18+ and Docker Desktop.
 
 ```bash
-git clone <repo-url>
-cd afro-italia-v2
-```
-
-### 2. Install dependencies
-
-```bash
+# Install
 cd server && npm install
 cd ../client && npm install
+
+# Configure
+cd ../server && cp .env.example .env
+cd ../client && cp .env.example .env
+
+# Generate a JWT secret and paste it into server/.env
+node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+
+# Database + data
+cd ../server
+docker compose up -d postgres
+npx prisma migrate dev --name init
+npm run db:seed && npm run db:seed:cities
+node prisma/seeds/businesses-reali.js
+
+# Run — two terminals
+npm run dev            # API   → http://localhost:5000
+cd ../client && npm start   # site → http://localhost:3000
 ```
 
-### 3. Database with Docker
+Demo account: `admin@afroitalia.com` / `password123` (development only — never
+created in production).
+
+---
+
+## Useful commands
 
 ```bash
-# from the project root
-docker-compose up -d
-docker ps   # check PostgreSQL is running
-```
+# Server
+npm run dev              # start with auto-reload
+npm test                 # run the test suite
+npm run db:studio        # visual database browser
+npm run db:seed:cities   # (re)load the 107 cities
 
-Access:
-
-- **PostgreSQL** — `localhost:5432`
-- **pgAdmin** — `http://localhost:5050` (credentials are set in `docker-compose.yml`)
-
----
-
-## ⚙️ Configuration
-
-> **⚠️ Never commit real credentials.** The `.env` files are gitignored; only
-> `.env.example` belongs in the repository, and it must contain placeholders
-> only. If a key is ever committed, rotate it — removing it later is not enough.
-
-### Back end
-
-```bash
-cd server
-cp .env.example .env
-```
-
-Then fill in your own values:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/afroitalia_db"
-
-# JWT
-JWT_SECRET=your-jwt-secret-min-32-chars
-
-# Google Maps
-GOOGLE_MAPS_API_KEY=your-google-maps-key
-
-# Stripe
-STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
-```
-
-### Front end
-
-```bash
-cd client
-cp .env.example .env
-```
-
-```env
-REACT_APP_API_URL=http://localhost:5000/api
-REACT_APP_GOOGLE_MAPS_API_KEY=your-google-maps-key
-REACT_APP_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key
+# Client
+npm start                # development server
+npm run build            # production build
+npm run check:i18n       # verify translation completeness
 ```
 
 ---
 
-## 🚀 Running the project
+## Documentation
 
-### 1. Initialise the database
-
-```bash
-cd server
-npm run db:generate   # generate the Prisma client
-npm run db:migrate    # create the tables
-npm run db:seed       # populate with test data
-```
-
-### 2. Start the back end
-
-```bash
-cd server
-npm run dev
-```
-
-Runs on **http://localhost:5000** — health check at `/health`.
-
-### 3. Start the front end
-
-```bash
-cd client
-npm start
-```
-
-Runs on **http://localhost:3000**.
+| Document | Contents |
+|---|---|
+| **[FULL_APP_GUIDE.md](FULL_APP_GUIDE.md)** | Architecture, API reference, data model, common tasks |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | Step-by-step production deployment |
+| **[server/DOCKER.md](server/DOCKER.md)** | Docker configuration details |
 
 ---
 
-## 📁 Project structure
+## Project layout
 
 ```
-.
-├── client/                     # React front end
-│   ├── src/
-│   │   ├── components/         # Reusable components
-│   │   ├── pages/              # Application pages
-│   │   ├── services/           # API services (AJAX)
-│   │   │   ├── api.js          # Fetch configuration
-│   │   │   └── businessService.js
-│   │   ├── context/            # Context API (global state)
-│   │   ├── hooks/              # Custom hooks
-│   │   └── App.jsx
-│   └── package.json
-│
-├── server/                     # Express back end
-│   ├── src/
-│   │   ├── routes/             # REST API routes
-│   │   ├── controllers/        # Business logic
-│   │   ├── middleware/         # Auth, validation
-│   │   ├── services/           # Email, maps, etc.
-│   │   ├── app.js              # Express configuration
-│   │   └── server.js           # Entry point
-│   ├── prisma/
-│   │   ├── schema.prisma       # Database schema
-│   │   └── seed.js             # Test data
-│   └── package.json
-│
-├── database/                   # SQL scripts
-├── docs/                       # Documentation
-└── docker-compose.yml          # PostgreSQL + Redis
+client/    React application (pages, components, translations, styles)
+server/    Express API (controllers, routes, middleware, Prisma schema)
 ```
 
 ---
 
-## 📡 API documentation
+## Roadmap
 
-Base URL: `http://localhost:5000/api`
-
-### 🔐 Authentication
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `POST` | `/api/auth/register` | Sign up |
-| `POST` | `/api/auth/login` | Sign in |
-| `POST` | `/api/auth/logout` | Sign out |
-| `GET` | `/api/auth/me` | Current user profile |
-
-### 🏢 Businesses
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/api/businesses` | List businesses |
-| `GET` | `/api/businesses/search` | Search |
-| `GET` | `/api/businesses/:slug` | Business details |
-| `POST` | `/api/businesses` | Create (auth required) |
-| `PUT` | `/api/businesses/:id` | Update (owner only) |
-| `DELETE` | `/api/businesses/:id` | Delete (owner or admin) |
-| `POST` | `/api/businesses/:id/favorite` | Toggle favourite (auth required) |
-
-### ⭐ Reviews
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/api/reviews/:businessId` | Reviews for a business |
-| `POST` | `/api/reviews` | Create a review (auth required) |
-| `PUT` | `/api/reviews/:id` | Update own review |
-| `DELETE` | `/api/reviews/:id` | Delete own review |
-
-### 👤 Users
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/api/users/profile` | Own profile |
-| `PUT` | `/api/users/profile` | Update own profile |
-| `GET` | `/api/users/favorites` | Own favourites |
-| `GET` | `/api/users/my-businesses` | Own businesses |
-
-### 🔧 Admin
-
-| Method | Endpoint | Purpose |
-|---|---|---|
-| `GET` | `/api/admin/businesses` | All businesses |
-| `PATCH` | `/api/admin/businesses/:id/verify` | Verify a business |
-| `GET` | `/api/admin/stats` | Statistics |
-
-### Example call
-
-```javascript
-import businessService from '../services/businessService';
-
-const fetchBusinesses = async () => {
-  try {
-    const response = await businessService.getAllBusinesses({
-      page: 1,
-      limit: 12,
-      city: 'milan',
-      category: 'restaurant'
-    });
-
-    console.log(response.data); // array of businesses
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-```
+- Object storage for uploaded images (currently URL-based)
+- Prerendering for perfect social-media share previews
+- Owner statistics (views, clicks)
 
 ---
 
-## 🌐 Deployment
-
-**Front end** (Netlify / Vercel)
-
-```bash
-cd client
-npm run build   # static files land in build/
-```
-
-**Back end** (Heroku / Railway / Render) — configure these environment variables:
-`DATABASE_URL`, `JWT_SECRET`, `GOOGLE_MAPS_API_KEY`, `STRIPE_SECRET_KEY`.
-
-**Database** — use a managed PostgreSQL service: Supabase (free up to 500 MB),
-Railway (with the PostGIS extension), Neon (serverless PostgreSQL) or AWS RDS.
-
----
-
-## 🧪 Tests
-
-```bash
-cd server && npm test
-cd client && npm test
-```
-
----
-
-## 📝 Migrating from v1
-
-If you are migrating from the previous version (Next.js + Supabase):
-
-1. Export the data from Supabase
-2. Create the new PostgreSQL database
-3. Import the data using the migration scripts
-4. Test the API with Postman
-5. Deploy progressively
-
-See `docs/MIGRATION.md` for the detailed guide.
-
----
-
-## 📄 Licence
-
-MIT — see the `LICENSE` file.
-
----
-
-## 🔗 Useful links
-
-- [Full API documentation](docs/API.md)
-- [Database schema](docs/DATABASE.md)
-- [Deployment guide](docs/DEPLOYMENT.md)
-
----
-
-**Author:** Colince Tcheussieu Mendji
+*Built for the African diaspora community in Italy.*

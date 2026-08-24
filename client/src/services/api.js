@@ -36,7 +36,30 @@ const handleResponse = async (response) => {
       window.location.href = '/login';
     }
 
-    throw new Error(data.message || 'Une erreur est survenue');
+    // Erreurs de validation (express-validator) : le serveur renvoie
+    // un tableau `errors` détaillé. On le remonte au lieu du seul
+    // message générique « Erreurs de validation », inutilisable.
+    let message = data.message || 'Une erreur est survenue';
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      const details = data.errors
+        .map(e => e.msg || e.message)
+        .filter(Boolean);
+      if (details.length > 0) message = details.join(' · ');
+    }
+
+    const error = new Error(message);
+    // Détail par champ, exploitable par les formulaires :
+    // { phone: 'Numéro de téléphone invalide', … }
+    if (Array.isArray(data.errors)) {
+      error.fieldErrors = data.errors.reduce((acc, e) => {
+        const field = e.path || e.param; // express-validator v7 = path, v6 = param
+        if (field && !acc[field]) acc[field] = e.msg || e.message;
+        return acc;
+      }, {});
+      error.errors = data.errors;
+    }
+    error.status = response.status;
+    throw error;
   }
 
   return data;

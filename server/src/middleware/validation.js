@@ -4,6 +4,20 @@
 
 const { body, validationResult } = require('express-validator');
 
+// ── Numéros de téléphone professionnels ──
+// Accepte : "+39 02 1234567", "02 1234567", "333 123 4567", "02-1234567",
+// "(02) 1234567", "+39.06.12345678". Exige 6 à 15 chiffres au total.
+const PHONE_REGEX = /^\+?[\d\s().-]{6,25}$/;
+const PHONE_MIN_DIGITS = 6;
+const PHONE_MAX_DIGITS = 15;
+
+/** Vérifie le format ET le nombre de chiffres réels */
+const isValidPhone = (value) => {
+  if (!PHONE_REGEX.test(value)) return false;
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= PHONE_MIN_DIGITS && digits.length <= PHONE_MAX_DIGITS;
+};
+
 /**
  * Middleware pour vérifier les erreurs de validation
  */
@@ -57,17 +71,61 @@ const validateBusiness = [
     .optional({ checkFalsy: true })
     .isFloat({ min: -180, max: 180 }).withMessage('Longitude invalide'),
 
+  // Téléphone : on accepte les numéros professionnels tels qu'ils s'écrivent
+  // en Italie — fixes ET mobiles, avec espaces, points, tirets, parenthèses
+  // et indicatif international. (isMobilePhone refusait les fixes, ex. 02 1234567.)
   body('phone')
     .optional({ checkFalsy: true })
-    .isMobilePhone('any').withMessage('Numéro de téléphone invalide'),
+    .trim()
+    .custom(isValidPhone).withMessage('Numéro de téléphone invalide'),
+
+  body('whatsapp')
+    .optional({ checkFalsy: true })
+    .trim()
+    .custom(isValidPhone).withMessage('Numéro WhatsApp invalide'),
 
   body('email')
     .optional({ checkFalsy: true })
     .isEmail().withMessage('Email invalide'),
 
+  // require_tld: un domaine complet est exigé (https://exemple → invalide)
   body('website')
     .optional({ checkFalsy: true })
-    .isURL().withMessage('URL du site web invalide'),
+    .trim()
+    .isURL({ require_protocol: false, require_tld: true })
+    .withMessage('URL du site web invalide'),
+
+  validate
+];
+
+/**
+ * Validation d'une revendication de fiche (« C'est mon activité »)
+ */
+const validateClaim = [
+  body('fullName')
+    .trim()
+    .notEmpty().withMessage('Le nom complet est requis')
+    .isLength({ min: 2, max: 120 }).withMessage('Nom complet invalide'),
+
+  body('role')
+    .trim()
+    .notEmpty().withMessage('Votre rôle dans l\'entreprise est requis')
+    .isLength({ max: 80 }).withMessage('Rôle trop long'),
+
+  body('phone')
+    .trim()
+    .notEmpty().withMessage('Le téléphone est requis')
+    .custom(isValidPhone).withMessage('Numéro de téléphone invalide'),
+
+  body('email')
+    .trim()
+    .notEmpty().withMessage('L\'email est requis')
+    .isEmail().withMessage('Email invalide'),
+
+  body('message')
+    .optional({ checkFalsy: true })
+    .trim()
+    .isLength({ max: 1000 }).withMessage('Message trop long (1000 caractères max)'),
 
   validate
 ];
@@ -120,9 +178,11 @@ const validateLogin = [
  * Validation pour un review
  */
 const validateReview = [
+  // Les IDs sont des cuid (ex. « cmf3x8k2p0000qw3h5n8t2y1a »), pas des UUID :
+  // isUUID() rejetait donc toutes les publications d'avis.
   body('businessId')
     .notEmpty().withMessage('L\'ID de l\'entreprise est requis')
-    .isUUID().withMessage('ID d\'entreprise invalide'),
+    .isString().withMessage('ID d\'entreprise invalide'),
 
   body('rating')
     .notEmpty().withMessage('La note est requise')
@@ -139,6 +199,7 @@ const validateReview = [
 module.exports = {
   validate,
   validateBusiness,
+  validateClaim,
   validateRegister,
   validateLogin,
   validateReview

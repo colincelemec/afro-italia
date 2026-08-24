@@ -35,6 +35,12 @@ export const translations = {
         it: "Accedi"
       }
     },
+    stats: {
+      cities: { en: "Cities covered", fr: "Villes couvertes", it: "Città coperte" },
+      categories: { en: "Categories", fr: "Catégories", it: "Categorie" },
+      languages: { en: "Languages", fr: "Langues", it: "Lingue" },
+      free: { en: "Free to join", fr: "Gratuit", it: "Gratis" }
+    },
     mission: {
       title: {
         en: "🎯 Our Mission",
@@ -276,6 +282,45 @@ export const translations = {
         en: "💬 What Our Community Says",
         fr: "💬 Ce Que Dit Notre Communauté",
         it: "💬 Cosa Dice la Nostra Comunità"
+      },
+      t1: {
+        text: {
+          en: "AfroItalia helped me discover amazing African restaurants in Milan I never knew existed. It's become my go-to platform!",
+          fr: "AfroItalia m'a permis de découvrir de superbes restaurants africains à Milan dont j'ignorais l'existence. C'est devenu ma plateforme préférée !",
+          it: "AfroItalia mi ha aiutato a scoprire fantastici ristoranti africani a Milano che non conoscevo. È diventata la mia piattaforma di riferimento!"
+        },
+        name: { en: "Amina K.", fr: "Amina K.", it: "Amina K." },
+        role: {
+          en: "Customer — Milano",
+          fr: "Cliente — Milano",
+          it: "Cliente — Milano"
+        }
+      },
+      t2: {
+        text: {
+          en: "Since joining AfroItalia, my hair salon's visibility has increased by 300%. The platform truly supports African businesses.",
+          fr: "Depuis mon inscription sur AfroItalia, la visibilité de mon salon de coiffure a augmenté de 300 %. La plateforme soutient vraiment les entreprises africaines.",
+          it: "Da quando sono su AfroItalia, la visibilità del mio salone è aumentata del 300%. La piattaforma sostiene davvero le attività africane."
+        },
+        name: { en: "Emmanuel O.", fr: "Emmanuel O.", it: "Emmanuel O." },
+        role: {
+          en: "Business Owner — Roma",
+          fr: "Propriétaire — Roma",
+          it: "Titolare — Roma"
+        }
+      },
+      t3: {
+        text: {
+          en: "Finally, a platform that celebrates our community! I've connected with so many entrepreneurs and customers through AfroItalia.",
+          fr: "Enfin une plateforme qui célèbre notre communauté ! J'ai rencontré tant d'entrepreneurs et de clients grâce à AfroItalia.",
+          it: "Finalmente una piattaforma che celebra la nostra comunità! Ho conosciuto tantissimi imprenditori e clienti grazie ad AfroItalia."
+        },
+        name: { en: "Fatou D.", fr: "Fatou D.", it: "Fatou D." },
+        role: {
+          en: "Business Owner — Torino",
+          fr: "Propriétaire — Torino",
+          it: "Titolare — Torino"
+        }
       }
     },
     finalCta: {
@@ -651,6 +696,16 @@ export const translations = {
       fr: "Français",
       it: "Italiano"
     },
+    showPassword: {
+      en: "Show password",
+      fr: "Afficher le mot de passe",
+      it: "Mostra la password"
+    },
+    hidePassword: {
+      en: "Hide password",
+      fr: "Masquer le mot de passe",
+      it: "Nascondi la password"
+    },
     notFound: {
       code: { en: "404", fr: "404", it: "404" },
       title: {
@@ -771,7 +826,31 @@ export const translations = {
         it: "Questa recensione verrà eliminata definitivamente."
       },
       confirmYes: { en: "Yes, confirm", fr: "Oui, confirmer", it: "Sì, conferma" },
-      confirmCancel: { en: "Cancel", fr: "Annuler", it: "Annulla" }
+      confirmCancel: { en: "Cancel", fr: "Annuler", it: "Annulla" },
+
+      // ── Revendications de fiches ──
+      tabClaims: { en: "Claims", fr: "Revendications", it: "Richieste" },
+      noClaims: { en: "No claims yet.", fr: "Aucune revendication.", it: "Nessuna richiesta." },
+      claimRequester: { en: "Requester", fr: "Demandeur", it: "Richiedente" },
+      claimRole: { en: "Role", fr: "Rôle", it: "Ruolo" },
+      claimMessage: { en: "Message", fr: "Message", it: "Messaggio" },
+      claimApprove: { en: "Approve", fr: "Approuver", it: "Approva" },
+      claimReject: { en: "Reject", fr: "Refuser", it: "Rifiuta" },
+      claimApproveTitle: { en: "Approve this claim?", fr: "Approuver cette demande ?", it: "Approvare questa richiesta?" },
+      claimApproveMsg: {
+        en: "The business will be transferred to this user, who will be able to manage it.",
+        fr: "L'activité sera transférée à cet utilisateur, qui pourra la gérer.",
+        it: "L'attività sarà trasferita a questo utente, che potrà gestirla."
+      },
+      claimRejectTitle: { en: "Reject this claim?", fr: "Refuser cette demande ?", it: "Rifiutare questa richiesta?" },
+      claimRejectMsg: {
+        en: "The requester will be notified by email.",
+        fr: "Le demandeur sera notifié par email.",
+        it: "Il richiedente riceverà una notifica via email."
+      },
+      claimStatus_PENDING: { en: "Pending", fr: "En attente", it: "In attesa" },
+      claimStatus_APPROVED: { en: "Approved", fr: "Approuvée", it: "Approvata" },
+      claimStatus_REJECTED: { en: "Rejected", fr: "Refusée", it: "Rifiutata" }
     },
 
     addService: {
@@ -801,6 +880,16 @@ export const translations = {
       selectCategory: { en: "Select a category", fr: "Choisir une catégorie", it: "Seleziona una categoria" },
       city: { en: "City", fr: "Ville", it: "Città" },
       selectCity: { en: "Select a city", fr: "Choisir une ville", it: "Seleziona una città" },
+      searchCity: { en: "Search a city…", fr: "Rechercher une ville…", it: "Cerca una città…" },
+      country: { en: "Country", fr: "Pays", it: "Paese" },
+      searchCountry: { en: "Search a country…", fr: "Rechercher un pays…", it: "Cerca un paese…" },
+      noCountryFound: { en: "No country found", fr: "Aucun pays trouvé", it: "Nessun paese trovato" },
+      errPhone: {
+        en: "This phone number is not valid for the selected country.",
+        fr: "Ce numéro n'est pas valide pour le pays sélectionné.",
+        it: "Questo numero non è valido per il paese selezionato."
+      },
+      noCityFound: { en: "No city found", fr: "Aucune ville trouvée", it: "Nessuna città trovata" },
       address: { en: "Address", fr: "Adresse", it: "Indirizzo" },
       addressPh: { en: "Street and number", fr: "Rue et numéro", it: "Via e numero" },
       description: { en: "Description", fr: "Description", it: "Descrizione" },
@@ -812,10 +901,36 @@ export const translations = {
       minChars: { en: "min. characters", fr: "caractères min.", it: "caratteri min." },
 
       mapHelp: {
-        en: "Click on the map to place the exact location (or drag the pin).",
-        fr: "Cliquez sur la carte pour placer l'emplacement exact (ou déplacez le repère).",
-        it: "Clicca sulla mappa per posizionare il punto esatto (oppure trascina il segnaposto)."
+        en: "Enter the address above and the pin is placed automatically. You can also click the map or drag the pin to adjust it.",
+        fr: "Saisissez l'adresse ci-dessus et le repère se place automatiquement. Vous pouvez aussi cliquer sur la carte ou déplacer le repère pour l'ajuster.",
+        it: "Inserisci l'indirizzo qui sopra e il segnaposto viene posizionato automaticamente. Puoi anche cliccare sulla mappa o trascinare il segnaposto per correggerlo."
       },
+      geoSearching: {
+        en: "Searching for the address…",
+        fr: "Recherche de l'adresse…",
+        it: "Ricerca dell'indirizzo in corso…"
+      },
+      geoFound: {
+        en: "Address found on the map",
+        fr: "Adresse trouvée sur la carte",
+        it: "Indirizzo trovato sulla mappa"
+      },
+      geoNotFound: {
+        en: "Address not found. Check the spelling or place the pin manually on the map.",
+        fr: "Adresse introuvable. Vérifiez l'orthographe ou placez le repère manuellement sur la carte.",
+        it: "Indirizzo non trovato. Controlla l'ortografia oppure posiziona il segnaposto manualmente sulla mappa."
+      },
+      geoError: {
+        en: "Address search unavailable. Place the pin manually on the map.",
+        fr: "Recherche d'adresse indisponible. Placez le repère manuellement sur la carte.",
+        it: "Ricerca indirizzo non disponibile. Posiziona il segnaposto manualmente sulla mappa."
+      },
+      geoSelectCityFirst: {
+        en: "Select a city to locate the address.",
+        fr: "Choisissez une ville pour localiser l'adresse.",
+        it: "Scegli una città per localizzare l'indirizzo."
+      },
+      geoRetry: { en: "Search again", fr: "Rechercher à nouveau", it: "Cerca di nuovo" },
       coords: { en: "Selected position", fr: "Position choisie", it: "Posizione scelta" },
       coordsDefault: {
         en: "No pin set — the city center will be used.",
@@ -976,7 +1091,160 @@ export const translations = {
       page: { en: "Page", fr: "Page", it: "Pagina" },
       pageOf: { en: "of", fr: "sur", it: "di" },
       premium: { en: "Premium", fr: "Premium", it: "Premium" },
-      seeDetails: { en: "See details →", fr: "Voir les détails →", it: "Vedi dettagli →" }
+      seeDetails: { en: "See details →", fr: "Voir les détails →", it: "Vedi dettagli →" },
+
+      // Etichette di accessibilità (lettori di schermo)
+      a11ySearch: { en: "Search a business", fr: "Rechercher une activité", it: "Cerca un'attività" },
+      a11yClearSearch: { en: "Clear search", fr: "Effacer la recherche", it: "Cancella ricerca" },
+      a11yScrollLeft: { en: "Scroll left", fr: "Défiler vers la gauche", it: "Scorri a sinistra" },
+      a11yScrollRight: { en: "Scroll right", fr: "Défiler vers la droite", it: "Scorri a destra" },
+      a11yCategories: { en: "Categories", fr: "Catégories", it: "Categorie" },
+      a11yFilterCity: { en: "Filter by city", fr: "Filtrer par ville", it: "Filtra per città" },
+      a11ySortBy: { en: "Sort by", fr: "Trier par", it: "Ordina per" },
+      a11yViewMode: { en: "Display mode", fr: "Mode d'affichage", it: "Modalità di visualizzazione" },
+      a11yGridView: { en: "Grid view", fr: "Vue grille", it: "Vista griglia" },
+      a11yMapView: { en: "Map view", fr: "Vue carte", it: "Vista mappa" }
+    },
+
+    // ── Scheda attività (BusinessDetail) ──
+    businessDetail: {
+      loading: { en: "Loading business…", fr: "Chargement de l'activité…", it: "Caricamento attività…" },
+      notFound: { en: "Business not found.", fr: "Activité introuvable.", it: "Attività non trovata." },
+      backToDirectory: { en: "← Back to directory", fr: "← Retour à l'annuaire", it: "← Torna alla directory" },
+      directory: { en: "Directory", fr: "Annuaire", it: "Directory" },
+
+      // Azioni
+      call: { en: "Call", fr: "Appeler", it: "Chiama" },
+      addFavorite: { en: "Add to favorites", fr: "Ajouter aux favoris", it: "Aggiungi ai preferiti" },
+      removeFavorite: { en: "Remove from favorites", fr: "Retirer des favoris", it: "Rimuovi dai preferiti" },
+      favoriteAdded: { en: "Added to favorites!", fr: "Ajouté aux favoris !", it: "Aggiunto ai preferiti!" },
+      favoriteRemoved: { en: "Removed from favorites.", fr: "Retiré des favoris.", it: "Rimosso dai preferiti." },
+      favoriteError: {
+        en: "Could not update favorites. Please try again.",
+        fr: "Impossible de mettre à jour les favoris. Réessayez.",
+        it: "Impossibile aggiornare i preferiti. Riprova."
+      },
+
+      // Schede
+      tabInfo: { en: "Information", fr: "Informations", it: "Informazioni" },
+      tabReviews: { en: "Reviews", fr: "Avis", it: "Recensioni" },
+      tabMap: { en: "Map", fr: "Carte", it: "Mappa" },
+
+      // Informazioni
+      about: { en: "About us", fr: "Qui sommes-nous", it: "Chi siamo" },
+      followUs: { en: "Follow us", fr: "Suivez-nous", it: "Seguici" },
+      websiteLink: { en: "Website", fr: "Site web", it: "Sito web" },
+      contacts: { en: "Contact", fr: "Contacts", it: "Contatti" },
+      hours: { en: "Opening hours", fr: "Horaires", it: "Orari" },
+      closed: { en: "Closed", fr: "Fermé", it: "Chiuso" },
+
+      // Giorni della settimana
+      monday: { en: "Monday", fr: "Lundi", it: "Lunedì" },
+      tuesday: { en: "Tuesday", fr: "Mardi", it: "Martedì" },
+      wednesday: { en: "Wednesday", fr: "Mercredi", it: "Mercoledì" },
+      thursday: { en: "Thursday", fr: "Jeudi", it: "Giovedì" },
+      friday: { en: "Friday", fr: "Vendredi", it: "Venerdì" },
+      saturday: { en: "Saturday", fr: "Samedi", it: "Sabato" },
+      sunday: { en: "Sunday", fr: "Dimanche", it: "Domenica" },
+
+      // Recensioni
+      reviewsCount: { en: "reviews", fr: "avis", it: "recensioni" },
+      writeReview: { en: "Write a review", fr: "Écrire un avis", it: "Scrivi una recensione" },
+      yourReview: { en: "Your review", fr: "Votre avis", it: "La tua recensione" },
+      rating: { en: "Rating", fr: "Note", it: "Valutazione" },
+      reviewPlaceholder: {
+        en: "Share your experience with the community…",
+        fr: "Partagez votre expérience avec la communauté…",
+        it: "Condividi la tua esperienza con la community…"
+      },
+      cancel: { en: "Cancel", fr: "Annuler", it: "Annulla" },
+      publish: { en: "Publish", fr: "Publier", it: "Pubblica" },
+      publishing: { en: "Publishing…", fr: "Publication…", it: "Pubblicazione…" },
+      reviewEmpty: { en: "Please write a comment.", fr: "Veuillez écrire un commentaire.", it: "Scrivi un commento." },
+      reviewSuccess: {
+        en: "Review published successfully!",
+        fr: "Avis publié avec succès !",
+        it: "Recensione pubblicata con successo!"
+      },
+      reviewError: {
+        en: "Error while publishing.",
+        fr: "Erreur lors de la publication.",
+        it: "Errore durante la pubblicazione."
+      },
+      noReviews: {
+        en: "No reviews yet. Be the first!",
+        fr: "Aucun avis pour l'instant. Soyez le premier !",
+        it: "Nessuna recensione ancora. Sii il primo!"
+      },
+      ownerResponse: { en: "Owner's response:", fr: "Réponse du propriétaire :", it: "Risposta del proprietario:" },
+      loginToReview: { en: "to leave a review.", fr: "pour laisser un avis.", it: "per lasciare una recensione." },
+      login: { en: "Sign in", fr: "Connectez-vous", it: "Accedi" },
+
+      // Mappa
+      noCoords: {
+        en: "GPS coordinates not available for this business.",
+        fr: "Coordonnées GPS non disponibles pour cette activité.",
+        it: "Coordinate GPS non disponibili per questa attività."
+      },
+      outOf5: { en: "out of 5", fr: "sur 5", it: "su 5" },
+
+      // ── Condivisione ──
+      share: { en: "Share", fr: "Partager", it: "Condividi" },
+      shareWhatsapp: { en: "Share on WhatsApp", fr: "Partager sur WhatsApp", it: "Condividi su WhatsApp" },
+      shareFacebook: { en: "Share on Facebook", fr: "Partager sur Facebook", it: "Condividi su Facebook" },
+      shareEmail: { en: "Share by email", fr: "Partager par email", it: "Condividi via email" },
+      copyLink: { en: "Copy link", fr: "Copier le lien", it: "Copia link" },
+      linkCopied: { en: "Link copied!", fr: "Lien copié !", it: "Link copiato!" },
+      shareText: {
+        en: "Check out this business on AfroItalia:",
+        fr: "Découvrez cette activité sur AfroItalia :",
+        it: "Scopri questa attività su AfroItalia:"
+      },
+
+      // ── Rivendicazione della scheda ──
+      claimTitle: { en: "Is this your business?", fr: "C'est votre activité ?", it: "È la tua attività?" },
+      claimButton: { en: "Claim this business", fr: "Revendiquer cette fiche", it: "Rivendica questa attività" },
+      claimIntro: {
+        en: "This listing was created from our community census. If you own or manage this business, request access to edit it, add photos and reply to reviews.",
+        fr: "Cette fiche a été créée à partir de notre recensement communautaire. Si vous êtes propriétaire ou gérant, demandez l'accès pour la modifier, ajouter des photos et répondre aux avis.",
+        it: "Questa scheda è stata creata dal nostro censimento della community. Se sei il proprietario o il gestore, richiedi l'accesso per modificarla, aggiungere foto e rispondere alle recensioni."
+      },
+      claimFullName: { en: "Full name", fr: "Nom complet", it: "Nome e cognome" },
+      claimRole: { en: "Your role", fr: "Votre rôle", it: "Il tuo ruolo" },
+      claimRolePh: { en: "Owner, manager…", fr: "Propriétaire, gérant…", it: "Proprietario, gestore…" },
+      claimPhone: { en: "Phone", fr: "Téléphone", it: "Telefono" },
+      claimEmail: { en: "Email", fr: "Email", it: "Email" },
+      claimMessage: { en: "Message (optional)", fr: "Message (facultatif)", it: "Messaggio (facoltativo)" },
+      claimMessagePh: {
+        en: "Anything that helps us verify you own this business…",
+        fr: "Tout élément nous aidant à vérifier que vous êtes le propriétaire…",
+        it: "Qualsiasi elemento che ci aiuti a verificare che sei il proprietario…"
+      },
+      claimSubmit: { en: "Send request", fr: "Envoyer la demande", it: "Invia richiesta" },
+      claimSending: { en: "Sending…", fr: "Envoi…", it: "Invio…" },
+      claimCancel: { en: "Cancel", fr: "Annuler", it: "Annulla" },
+      claimSuccess: {
+        en: "Request sent! Our team will verify it within 24-48 hours.",
+        fr: "Demande envoyée ! Notre équipe la vérifiera sous 24 à 48 heures.",
+        it: "Richiesta inviata! Il nostro team la verificherà entro 24-48 ore."
+      },
+      claimPending: {
+        en: "Your claim is being reviewed",
+        fr: "Votre demande est en cours d'examen",
+        it: "La tua richiesta è in fase di verifica"
+      },
+      claimApproved: { en: "You manage this business", fr: "Vous gérez cette activité", it: "Gestisci questa attività" },
+      claimRejected: {
+        en: "Your previous claim was not approved. You can submit a new one.",
+        fr: "Votre demande précédente n'a pas été approuvée. Vous pouvez en soumettre une nouvelle.",
+        it: "La tua richiesta precedente non è stata approvata. Puoi inviarne una nuova."
+      },
+      claimLoginFirst: {
+        en: "Sign in to claim this business",
+        fr: "Connectez-vous pour revendiquer cette fiche",
+        it: "Accedi per rivendicare questa attività"
+      },
+      claimRequired: { en: "This field is required", fr: "Ce champ est requis", it: "Campo obbligatorio" }
     },
 
     profile: {

@@ -517,6 +517,74 @@
   flex-wrap: wrap;
 }
 
+/* ════════ STATS BAND ════════ */
+.stats-band {
+  position: relative;
+  z-index: 2;
+  padding: 0 0 8px;
+  margin-top: -32px;
+}
+
+.stats-band__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  background: var(--gh-bg-soft);
+  border: 1px solid var(--gh-border);
+  border-radius: 16px;
+  padding: 28px 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.stat-item__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(232, 163, 61, 0.12);
+  border: 1px solid rgba(232, 163, 61, 0.3);
+  color: var(--gh-gold);
+  margin-bottom: 4px;
+  transition: transform 0.25s ease;
+}
+
+.stat-item:hover .stat-item__icon { transform: translateY(-3px) scale(1.05); }
+
+.stat-item__value {
+  font-family: var(--gh-font);
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--gh-text-bright);
+}
+
+.stat-item__label {
+  font-size: 0.85rem;
+  color: var(--gh-muted);
+}
+
+/* Icona feature: micro-animazione all'hover della card */
+.feature-icon,
+.feature-card .feature-icon {
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: translateY(-3px) scale(1.06);
+  background: rgba(232, 163, 61, 0.2);
+  border-color: rgba(232, 163, 61, 0.55);
+}
+
 /* ════════ RESPONSIVE ════════ */
 @media (max-width: 760px) {
   .hero-section { min-height: 80vh; padding: 100px 20px 70px; }
@@ -532,6 +600,20 @@
   .gh-orb { filter: blur(80px); }
 
   .final-cta-section { padding: 80px 0; }
+
+  /* Stats band: 2 colonne su mobile */
+  .stats-band { margin-top: -16px; }
+  .stats-band__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 12px;
+    padding: 24px 16px;
+  }
+  .stat-item__value { font-size: 1.6rem; }
+}
+
+@media (max-width: 380px) {
+  .stats-band__grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-item__label { font-size: 0.78rem; }
 }
 
 
@@ -546,6 +628,11 @@
 
 /* Orbe più tenui sul chiaro */
 [data-theme='light'] .gh-orb { opacity: 0.3; }
+
+/* Stats band: ombra più tenue sul chiaro */
+[data-theme='light'] .stats-band__grid {
+  box-shadow: 0 12px 36px rgba(45, 33, 24, 0.10);
+}
 
 /* Card hover: ombra leggera invece del bagliore scuro */
 [data-theme='light'] .gh-card:hover {

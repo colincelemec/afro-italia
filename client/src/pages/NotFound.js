@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
 import Icon from '../components/common/Icon';
 import '../styles/NotFound.css';
 
@@ -15,6 +16,9 @@ const NotFound = () => {
   const { isAuthenticated } = useAuthStore();
   const { language } = useLanguage();
   const t = (path) => getTranslation(path, language);
+
+  // Une page 404 ne doit jamais être indexée
+  usePageMeta({ title: t('common.notFound.title'), noIndex: true });
 
   return (
     <div className="nf">

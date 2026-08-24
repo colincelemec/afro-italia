@@ -1,300 +1,160 @@
-# Docker Setup pour AfroItalia API
+# Docker Setup
 
-Ce guide vous explique comment utiliser Docker pour développer et déployer l'API AfroItalia.
+Docker is used **only for local development**, to run PostgreSQL without
+installing it on your machine. In production, Railway provides the database.
 
-## 📋 Prérequis
+---
 
-- Docker Desktop installé ([Download](https://www.docker.com/products/docker-desktop))
-- Docker Compose (inclus avec Docker Desktop)
+## Prerequisites
 
-## 🚀 Démarrage Rapide
+- **Docker Desktop** installed and running
+  ([download](https://www.docker.com/products/docker-desktop))
 
-### 1. Configuration de l'environnement
-
-Créez un fichier `.env` à partir du template Docker :
-
-```bash
-cp .env.docker .env
-```
-
-Modifiez les variables selon vos besoins (notamment les secrets JWT, Stripe, etc.)
-
-### 2. Lancer tous les services
+Check it works:
 
 ```bash
-# Démarrer tous les services en arrière-plan
-docker-compose up -d
-
-# Ou en mode verbose (voir les logs)
-docker-compose up
+docker --version
+docker compose version
 ```
 
-Cela va démarrer :
-- ✅ PostgreSQL (port 5432)
-- ✅ Redis (port 6379)
-- ✅ API Node.js (port 5000)
-- ✅ Prisma Studio (port 5555)
+---
 
-### 3. Initialiser la base de données
+## Normal usage
+
+For everyday development you only need the database. The API runs directly on
+your machine with `npm run dev`, which gives you instant hot reload.
 
 ```bash
-# Créer les tables
-docker-compose exec api npx prisma db push
+cd server
 
-# Seed la base de données
-docker-compose exec api npm run db:seed
+docker compose up -d postgres     # start the database
+docker compose ps                 # check it is running
+docker compose stop               # stop it (keeps the data)
 ```
 
-### 4. Accéder aux services
+The database is reachable at `localhost:5432`, which matches the default
+`DATABASE_URL` in `.env`:
 
-- **API** : http://localhost:5000
-- **Prisma Studio** : http://localhost:5555
-- **PostgreSQL** : localhost:5432
-- **Redis** : localhost:6379
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/afroitalia_db?schema=public"
+```
 
-## 🛠️ Commandes Docker Utiles
+---
 
-### Gestion des conteneurs
+## Available services
+
+`docker-compose.yml` defines four services. You rarely need more than the
+first one.
+
+| Service | Port | Purpose |
+|---|---|---|
+| `postgres` | 5432 | The database — **the only one you normally need** |
+| `redis` | 6379 | Cache, reserved for future use |
+| `api` | 5001 | The API inside a container (alternative to `npm run dev`) |
+| `prisma-studio` | 5555 | Visual database browser |
+
+### Running the whole stack in containers
 
 ```bash
-# Voir les conteneurs en cours d'exécution
-docker-compose ps
-
-# Voir les logs
-docker-compose logs
-
-# Voir les logs d'un service spécifique
-docker-compose logs api
-docker-compose logs postgres
-
-# Suivre les logs en temps réel
-docker-compose logs -f api
-
-# Arrêter tous les services
-docker-compose down
-
-# Arrêter et supprimer les volumes (⚠️ supprime les données)
-docker-compose down -v
+docker compose up --build          # everything, with build
+docker compose up -d               # everything, in the background
+docker compose logs -f api         # follow the API logs
+docker compose down                # stop everything
 ```
 
-### Gestion de la base de données
+> Note the port difference: containerised, the API is exposed on **5001**
+> (`http://localhost:5001`). Run directly with `npm run dev`, it uses **5000**.
+> Make sure `REACT_APP_API_URL` in `client/.env` matches whichever you use.
+
+---
+
+## Database commands
 
 ```bash
-# Exécuter Prisma Studio
-docker-compose exec api npx prisma studio
+# Create/update the tables
+npx prisma migrate dev
 
-# Créer une migration
-docker-compose exec api npx prisma migrate dev --name nom_migration
+# Load the data
+npm run db:seed              # categories + demo accounts
+npm run db:seed:cities       # 107 Italian provincial capitals
+node prisma/seeds/businesses-reali.js
 
-# Appliquer les migrations
-docker-compose exec api npx prisma db push
+# Browse the data visually → http://localhost:5555
+npx prisma studio
 
-# Reset la base de données
-docker-compose exec api npx prisma migrate reset
-
-# Seed la base de données
-docker-compose exec api npm run db:seed
-
-# Accéder à PostgreSQL en ligne de commande
-docker-compose exec postgres psql -U postgres -d afroitalia_db
+# Open a psql session
+docker compose exec postgres psql -U postgres -d afroitalia_db
 ```
 
-### Shell dans un conteneur
+---
+
+## Backup and restore
 
 ```bash
-# Ouvrir un shell dans le conteneur API
-docker-compose exec api sh
+# Export
+docker compose exec postgres pg_dump -U postgres afroitalia_db > backup.sql
 
-# Ouvrir un shell dans le conteneur PostgreSQL
-docker-compose exec postgres sh
+# Import
+docker compose exec -T postgres psql -U postgres afroitalia_db < backup.sql
 ```
 
-### Rebuild des images
+---
+
+## Reset everything
+
+⚠️ **This permanently deletes all local data.**
 
 ```bash
-# Rebuild les images Docker
-docker-compose build
-
-# Rebuild sans cache
-docker-compose build --no-cache
-
-# Rebuild et redémarrer
-docker-compose up -d --build
+docker compose down -v       # removes the containers AND the volumes
+docker compose up -d postgres
+npx prisma migrate dev
+npm run db:seed && npm run db:seed:cities
+node prisma/seeds/businesses-reali.js
 ```
 
-## 🔄 Workflow de Développement
+Useful when the local database ends up in an inconsistent state.
 
-### Mode Développement (avec hot-reload)
+---
 
-Le docker-compose.yml est configuré pour le développement avec nodemon :
+## Troubleshooting
 
-```bash
-docker-compose up
-```
+### `Cannot connect to the Docker daemon`
 
-Les modifications de code seront automatiquement détectées et le serveur redémarrera.
+Docker Desktop is not running. Start it and wait for the whale icon to settle.
 
-### Mode Production
+### `Port 5432 is already allocated`
 
-Créez un fichier `docker-compose.prod.yml` :
+Another PostgreSQL is already using the port — often one installed natively.
+Either stop it, or change the port in `docker-compose.yml`:
 
 ```yaml
-version: '3.9'
-
-services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: production
-    command: npm start  # Pas de nodemon
+ports:
+  - "5433:5432"      # then use 5433 in DATABASE_URL
 ```
 
-Puis lancez :
+### `Can't reach database server at localhost:5432`
+
+The container is not started:
 
 ```bash
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+docker compose up -d postgres
+docker compose ps          # status must be "healthy"
 ```
 
-## 🐛 Debugging
+The health check takes a few seconds after startup.
 
-### Vérifier les logs d'erreur
+### The container starts then stops immediately
+
+Read the logs to find out why:
 
 ```bash
-# Tous les logs
-docker-compose logs
-
-# Dernières lignes
-docker-compose logs --tail=50
-
-# Logs en temps réel
-docker-compose logs -f api
+docker compose logs postgres
 ```
 
-### Vérifier la santé des services
+A frequent cause is a corrupted volume after an unclean shutdown — see
+[Reset everything](#reset-everything).
 
-```bash
-docker-compose ps
-```
+---
 
-Les services en bonne santé afficheront `healthy` dans la colonne Status.
-
-### Problèmes courants
-
-#### PostgreSQL ne démarre pas
-
-```bash
-# Vérifier les logs
-docker-compose logs postgres
-
-# Supprimer le volume et redémarrer
-docker-compose down -v
-docker-compose up -d postgres
-```
-
-#### L'API ne peut pas se connecter à PostgreSQL
-
-```bash
-# Attendre que PostgreSQL soit ready
-docker-compose exec postgres pg_isready -U postgres
-
-# Vérifier la DATABASE_URL dans .env
-# Doit être: postgresql://postgres:postgres@postgres:5432/afroitalia_db
-```
-
-#### Prisma Client non généré
-
-```bash
-docker-compose exec api npx prisma generate
-```
-
-## 📊 Prisma Studio (Interface Graphique)
-
-Prisma Studio est automatiquement lancé avec docker-compose.
-
-Accédez-y sur : http://localhost:5555
-
-Vous pouvez :
-- ✅ Voir toutes les tables
-- ✅ Ajouter/Modifier/Supprimer des données
-- ✅ Exécuter des requêtes
-- ✅ Voir les relations entre tables
-
-## 🔐 Sécurité
-
-### En développement
-
-Les mots de passe par défaut sont dans `.env.docker` :
-- PostgreSQL : `postgres/postgres`
-- JWT Secret : généré automatiquement
-
-### En production
-
-⚠️ **IMPORTANT** : Changez tous les secrets avant de déployer :
-
-```bash
-# .env
-POSTGRES_PASSWORD=un_mot_de_passe_super_fort
-JWT_SECRET=une_cle_secrete_longue_et_aleatoire
-JWT_REFRESH_SECRET=une_autre_cle_secrete
-```
-
-## 🌐 Déploiement
-
-### Docker Hub
-
-```bash
-# Build l'image
-docker build -t afroitalia/api:latest .
-
-# Push sur Docker Hub
-docker push afroitalia/api:latest
-```
-
-### Production
-
-Pour la production, utilisez des orchestrateurs comme :
-- **Docker Swarm**
-- **Kubernetes**
-- **AWS ECS**
-- **Google Cloud Run**
-
-## 📝 Structure des Volumes
-
-Les données persistantes sont stockées dans des volumes Docker :
-
-```
-volumes/
-├── postgres_data/  # Base de données PostgreSQL
-├── redis_data/     # Cache Redis
-└── uploads/        # Fichiers uploadés
-```
-
-Pour voir les volumes :
-
-```bash
-docker volume ls
-```
-
-## 🧹 Nettoyage
-
-```bash
-# Arrêter tous les conteneurs
-docker-compose down
-
-# Supprimer les volumes (⚠️ supprime les données)
-docker-compose down -v
-
-# Supprimer les images
-docker rmi afroitalia-server_api
-
-# Nettoyage complet Docker
-docker system prune -a --volumes
-```
-
-## 📚 Ressources
-
-- [Docker Documentation](https://docs.docker.com/)
-- [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [Prisma with Docker](https://www.prisma.io/docs/guides/deployment/deployment-guides/deploying-to-docker)
+*See `FULL_APP_GUIDE.md` for the full application guide, and `DEPLOYMENT.md`
+for production deployment.*

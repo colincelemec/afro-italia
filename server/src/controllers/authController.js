@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const emailService = require('../services/emailService');
+const { devDetails } = require('../utils/errorResponse');
 
 const prisma = new PrismaClient();
 
@@ -89,7 +90,7 @@ exports.register = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de l\'inscription',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -143,7 +144,7 @@ exports.login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la connexion',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -166,7 +167,7 @@ exports.logout = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la déconnexion',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -209,7 +210,7 @@ exports.getMe = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération du profil',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -262,7 +263,7 @@ exports.updatePassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour du mot de passe',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -309,7 +310,7 @@ exports.forgotPassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la demande de reset',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -414,7 +415,7 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la réinitialisation du mot de passe',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };

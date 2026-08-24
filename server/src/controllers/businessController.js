@@ -5,6 +5,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const emailService = require('../services/emailService');
+const { devDetails } = require('../utils/errorResponse');
 
 /**
  * @route   GET /api/businesses
@@ -84,7 +85,7 @@ exports.getAllBusinesses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des entreprises',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -154,7 +155,7 @@ exports.searchBusinesses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la recherche',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -221,7 +222,7 @@ exports.getBusinessBySlug = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération de l\'entreprise',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -296,7 +297,7 @@ exports.createBusiness = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de l\'entreprise',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -367,7 +368,7 @@ exports.updateBusiness = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -414,7 +415,7 @@ exports.deleteBusiness = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -471,7 +472,7 @@ exports.toggleFavorite = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -505,7 +506,7 @@ exports.getMyBusinesses = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -545,7 +546,7 @@ exports.verifyBusiness = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -584,7 +585,7 @@ exports.updateBusinessStatus = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };
@@ -644,7 +645,7 @@ exports.getBusinessReviews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur',
-      error: error.message
+      ...devDetails(error)
     });
   }
 };

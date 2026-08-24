@@ -11,19 +11,63 @@ const BRAND = 'AfroItalia';
 const PRIMARY = '#e8a33d';
 
 // --- Détection de la config SMTP ---
-const isConfigured = Boolean(process.env.SMTP_HOST && process.env.SMTP_USER);
+// Les valeurs d'exemple de .env.example ne sont PAS vides : sans ce contrôle,
+// le service se croyait configuré, tentait une vraie connexion avec de faux
+// identifiants, échouait, et l'erreur passait inaperçue. On les traite donc
+// comme « non configuré » et on retombe sur l'affichage console.
+const PLACEHOLDERS = [
+  'your-email@gmail.com',
+  'your-app-password',
+  'your-smtp-user',
+  'votre-email',
+  'changeme',
+];
+
+const isPlaceholder = (value) =>
+  !value || PLACEHOLDERS.some(p => String(value).toLowerCase().includes(p.toLowerCase()));
+
+const smtpHost = process.env.SMTP_HOST;
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+
+const isConfigured = Boolean(
+  smtpHost && !isPlaceholder(smtpUser) && !isPlaceholder(smtpPass)
+);
 
 let transporter = null;
 if (isConfigured) {
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host: smtpHost,
     port: parseInt(process.env.SMTP_PORT || '587', 10),
     secure: String(process.env.SMTP_SECURE).toLowerCase() === 'true', // true = 465
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: smtpUser,
+      pass: smtpPass,
     },
   });
+} else if (smtpHost && (isPlaceholder(smtpUser) || isPlaceholder(smtpPass))) {
+  // Cas piégeux : des variables existent mais contiennent encore l'exemple
+  console.warn(
+    '\n⚠️  SMTP ignoré : SMTP_USER/SMTP_PASS contiennent encore les valeurs ' +
+    'd\'exemple de .env.example.\n   Les emails seront affichés dans la console. ' +
+    'Renseignez de vrais identifiants pour les envoyer.\n'
+  );
+}
+
+/**
+ * Teste la connexion au serveur SMTP.
+ * @returns {Promise<{ok: boolean, reason?: string}>}
+ */
+async function verifyConnection() {
+  if (!isConfigured) {
+    return { ok: false, reason: 'SMTP non configuré (ou valeurs d\'exemple)' };
+  }
+  try {
+    await transporter.verify();
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, reason: error.message };
+  }
 }
 
 const FROM = process.env.EMAIL_FROM || `${BRAND} <no-reply@afroitalia.com>`;
@@ -99,8 +143,24 @@ async function send({ to, subject, html, text }) {
     console.log('   (Configurez SMTP_* dans .env pour un envoi réel)\n');
     return false;
   }
-  await transporter.sendMail({ from: FROM, to, subject, html, text });
-  return true;
+  try {
+    const info = await transporter.sendMail({ from: FROM, to, subject, html, text });
+    console.log(`📧 Email envoyé à ${to} — « ${subject} » (id: ${info.messageId})`);
+    return true;
+  } catch (error) {
+    // Un échec d'envoi ne doit pas faire échouer l'inscription, mais il doit
+    // être clairement visible dans les logs : sinon le problème passe inaperçu.
+    console.error(`\n❌ Échec de l'envoi de l'email à ${to}`);
+    console.error(`   Sujet : ${subject}`);
+    console.error(`   Cause : ${error.message}`);
+    if (/auth|credential|username|password/i.test(error.message)) {
+      console.error('   → Identifiants SMTP refusés. Avec Gmail, un mot de passe');
+      console.error('     d\'application est obligatoire (pas le mot de passe du compte).\n');
+    } else {
+      console.error('');
+    }
+    throw error;
+  }
 }
 
 // ============================================
@@ -185,6 +245,43 @@ const T = {
     },
     cta: { en: 'Update my listing', fr: 'Mettre à jour ma fiche', it: 'Aggiorna la mia scheda' },
   },
+  claimApproved: {
+    subject: {
+      en: `You now manage your business on ${BRAND} ✅`,
+      fr: `Vous gérez désormais votre activité sur ${BRAND} ✅`,
+      it: `Ora gestisci la tua attività su ${BRAND} ✅`,
+    },
+    title: {
+      en: 'Business claim approved',
+      fr: 'Revendication approuvée',
+      it: 'Richiesta approvata',
+    },
+    intro: {
+      en: (biz) => `Your request to manage "${biz}" has been approved. You can now edit the listing, add photos and reply to reviews from your dashboard.`,
+      fr: (biz) => `Votre demande pour gérer « ${biz} » a été approuvée. Vous pouvez désormais modifier la fiche, ajouter des photos et répondre aux avis depuis votre tableau de bord.`,
+      it: (biz) => `La tua richiesta per gestire "${biz}" è stata approvata. Ora puoi modificare la scheda, aggiungere foto e rispondere alle recensioni dalla tua dashboard.`,
+    },
+    cta: { en: 'Go to my dashboard', fr: 'Accéder à mon espace', it: 'Vai alla mia dashboard' },
+  },
+  claimRejected: {
+    subject: {
+      en: `About your request on ${BRAND}`,
+      fr: `Concernant votre demande sur ${BRAND}`,
+      it: `Riguardo alla tua richiesta su ${BRAND}`,
+    },
+    title: {
+      en: 'Business claim not approved',
+      fr: 'Revendication non approuvée',
+      it: 'Richiesta non approvata',
+    },
+    intro: {
+      en: (biz) => `We could not approve your request to manage "${biz}" at this time. If you believe this is a mistake, reply to this email with a proof of ownership (business licence, utility bill or registration document).`,
+      fr: (biz) => `Nous n'avons pas pu approuver votre demande pour gérer « ${biz} ». Si vous pensez qu'il s'agit d'une erreur, répondez à cet email avec un justificatif (licence, facture ou document d'enregistrement).`,
+      it: (biz) => `Non abbiamo potuto approvare la tua richiesta per gestire "${biz}". Se pensi si tratti di un errore, rispondi a questa email allegando un documento che attesti la proprietà (licenza, bolletta o visura).`,
+    },
+    cta: { en: 'View the listing', fr: 'Voir la fiche', it: 'Vedi la scheda' },
+    noteLabel: { en: 'Reason:', fr: 'Motif :', it: 'Motivo:' },
+  },
 };
 
 const pick = (obj, lang) => obj[lang] || obj.en;
@@ -247,9 +344,40 @@ async function sendBusinessStatusEmail(owner, business, status, lang = 'it') {
   });
 }
 
+/**
+ * Notification au demandeur : revendication approuvée / refusée
+ * status: 'APPROVED' | 'REJECTED'
+ */
+async function sendClaimStatusEmail(user, business, status, adminNote, lang = 'it') {
+  if (!user?.email) return false;
+  const approved = status === 'APPROVED';
+  const tpl = approved ? T.claimApproved : T.claimRejected;
+  const base = process.env.CLIENT_URL || '';
+  const url = approved ? `${base}/dashboard` : `${base}/businesses/${business.slug}`;
+
+  const note = !approved && adminNote
+    ? `<p style="font-size:14px;line-height:1.6;color:#7a6a5c;"><strong>${pick(tpl.noteLabel, lang)}</strong> ${adminNote}</p>`
+    : '';
+
+  const body = `
+    <p style="font-size:15px;line-height:1.7;color:#2d2118;">${pick(tpl.intro, lang)(business.name)}</p>
+    ${note}
+    ${button(url, pick(tpl.cta, lang))}
+  `;
+
+  return send({
+    to: user.email,
+    subject: pick(tpl.subject, lang),
+    html: layout({ title: pick(tpl.title, lang), body }),
+    text: `${pick(tpl.title, lang)} — ${pick(tpl.intro, lang)(business.name)} ${url}`,
+  });
+}
+
 module.exports = {
   isConfigured,
+  verifyConnection,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendBusinessStatusEmail,
+  sendClaimStatusEmail,
 };

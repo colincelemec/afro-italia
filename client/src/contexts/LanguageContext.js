@@ -17,8 +17,11 @@ export const LanguageProvider = ({ children }) => {
   });
 
   // Save language preference to localStorage whenever it changes
+  // and keep <html lang="…"> in sync (SEO + screen readers pronounce
+  // the page correctly, and it drives CSS :lang() rules).
   useEffect(() => {
     localStorage.setItem('afroitalia-language', language);
+    document.documentElement.setAttribute('lang', language);
   }, [language]);
 
   const changeLanguage = (lang) => {

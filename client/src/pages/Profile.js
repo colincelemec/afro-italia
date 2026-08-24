@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import useAuthStore from '../stores/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
 import Icon from '../components/common/Icon';
 import '../styles/Profile.css';
 
@@ -15,6 +16,8 @@ const Profile = () => {
   const { user, updateProfile } = useAuthStore();
   const { language } = useLanguage();
   const t = (path) => getTranslation(path, language);
+
+  usePageMeta({ title: t('app.nav.profile'), noIndex: true });
 
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -763,7 +763,7 @@
 .act-card--skeleton { pointer-events: none; }
 
 .act-shimmer {
-  background: linear-gradient(90deg, #161b22 25%, #21262d 50%, #161b22 75%);
+  background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
   background-size: 200% 100%;
   animation: act-shimmer 1.4s infinite;
 }

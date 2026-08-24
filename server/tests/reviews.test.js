@@ -72,6 +72,42 @@ describe('POST /api/reviews', () => {
     expect(res.body.success).toBe(false);
   });
 
+  // Régression : la validation exigeait un UUID alors que Prisma génère des
+  // cuid. Résultat, toute publication d'avis échouait sur « ID d'entreprise
+  // invalide », quel que soit le contenu du formulaire.
+  it('accepte un businessId au format cuid', async () => {
+    const cuid = 'cmf3x8k2p0000qw3h5n8t2y1a';
+    mockPrisma.user.findUnique.mockResolvedValue(authUser);
+    mockPrisma.business.findUnique.mockResolvedValue({ id: cuid, name: 'Teranga' });
+    mockPrisma.review.findUnique.mockResolvedValue(null);
+    mockPrisma.review.findFirst.mockResolvedValue(null);
+    mockPrisma.review.create.mockResolvedValue({ id: 'rev_1', rating: 5 });
+    mockPrisma.review.findMany.mockResolvedValue([{ rating: 5 }]);
+    mockPrisma.business.update.mockResolvedValue({});
+
+    const res = await request(app)
+      .post('/api/reviews')
+      .set('Authorization', `Bearer ${tokenFor(authUser.id)}`)
+      .send({ businessId: cuid, rating: 5, comment: 'Bellissimo ristorante e pulito' });
+
+    // La validation ne doit plus bloquer sur le format de l'identifiant
+    const failedFields = (res.body.errors || []).map(e => e.path || e.param);
+    expect(failedFields).not.toContain('businessId');
+    expect(res.status).not.toBe(400);
+  });
+
+  it('refuse un businessId vide (400)', async () => {
+    mockPrisma.user.findUnique.mockResolvedValue(authUser);
+
+    const res = await request(app)
+      .post('/api/reviews')
+      .set('Authorization', `Bearer ${tokenFor(authUser.id)}`)
+      .send({ businessId: '', rating: 5, comment: 'Test' });
+
+    expect(res.status).toBe(400);
+    expect((res.body.errors || []).map(e => e.path || e.param)).toContain('businessId');
+  });
+
   it('refuse un token invalide (401)', async () => {
     const res = await request(app)
       .post('/api/reviews')

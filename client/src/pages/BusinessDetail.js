@@ -4,8 +4,15 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import api from '../services/api';
+import businessService from '../services/businessService';
+import ClaimModal from '../components/business/ClaimModal';
+import ShareButtons from '../components/business/ShareButtons';
 import useAuthStore from '../stores/authStore';
 import { useToast } from '../contexts/ToastContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
+import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
 import '../styles/BusinessDetail.css';
 
@@ -37,16 +44,16 @@ const StarPicker = ({ value, onChange }) => (
   </div>
 );
 
-const DAYS_IT = {
-  monday: 'Lunedì', tuesday: 'Martedì', wednesday: 'Mercoledì',
-  thursday: 'Giovedì', friday: 'Venerdì', saturday: 'Sabato', sunday: 'Domenica'
-};
+// Ordine dei giorni; le etichette arrivano dalle traduzioni
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 const BusinessDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthStore();
   const toast = useToast();
+  const { language } = useLanguage();
+  const t = useCallback((path) => getTranslation(`app.businessDetail.${path}`, language), [language]);
 
   const [business, setBusiness] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -65,6 +72,21 @@ const BusinessDetail = () => {
   const [activeTab, setActiveTab] = useState('info');
   const [activeImage, setActiveImage] = useState(0);
 
+  // Rivendicazione della scheda
+  const [claimOpen, setClaimOpen] = useState(false);
+  const [myClaim, setMyClaim] = useState(null);
+
+  // Stato della mia richiesta (solo se connesso)
+  const loadMyClaim = useCallback(async (businessId) => {
+    if (!isAuthenticated || !businessId) return;
+    try {
+      const res = await businessService.getMyClaim(businessId);
+      setMyClaim(res.data || null);
+    } catch {
+      setMyClaim(null);
+    }
+  }, [isAuthenticated]);
+
   const fetchBusiness = useCallback(async () => {
     try {
       setLoading(true);
@@ -72,11 +94,11 @@ const BusinessDetail = () => {
       const res = await api.get(`/businesses/${slug}`);
       setBusiness(res.data);
     } catch (err) {
-      setError('Attività non trovata.');
+      setError(t('notFound'));
     } finally {
       setLoading(false);
     }
-  }, [slug]);
+  }, [slug, t]);
 
   const fetchReviews = useCallback(async (businessId) => {
     try {
@@ -94,8 +116,9 @@ const BusinessDetail = () => {
   useEffect(() => {
     if (business?.id) {
       fetchReviews(business.id);
+      loadMyClaim(business.id);
     }
-  }, [business, fetchReviews]);
+  }, [business, fetchReviews, loadMyClaim]);
 
   const handleFavorite = async () => {
     if (!isAuthenticated) { navigate('/login'); return; }
@@ -103,16 +126,16 @@ const BusinessDetail = () => {
     try {
       await api.post(`/businesses/${business.id}/favorite`);
       setIsFavorite(prev => !prev);
-      toast.success(wasFavorite ? 'Rimosso dai preferiti.' : 'Aggiunto ai preferiti!');
+      toast.success(wasFavorite ? t('favoriteRemoved') : t('favoriteAdded'));
     } catch (err) {
-      toast.error(err.message || 'Impossibile aggiornare i preferiti. Riprova.');
+      toast.error(err.message || t('favoriteError'));
     }
   };
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!isAuthenticated) { navigate('/login'); return; }
-    if (!reviewComment.trim()) { setReviewError('Scrivi un commento.'); return; }
+    if (!reviewComment.trim()) { setReviewError(t('reviewEmpty')); return; }
 
     setSubmittingReview(true);
     setReviewError('');
@@ -124,18 +147,28 @@ const BusinessDetail = () => {
         rating: reviewRating,
         comment: reviewComment.trim(),
       });
-      setReviewSuccess('Recensione pubblicata con successo!');
+      setReviewSuccess(t('reviewSuccess'));
       setReviewComment('');
       setReviewRating(5);
       setShowReviewForm(false);
       fetchReviews(business.id);
       fetchBusiness();
     } catch (err) {
-      setReviewError(err.message || 'Errore durante la pubblicazione.');
+      // Les messages de validation du serveur sont en français : dans une
+      // interface traduite on affiche notre message localisé à la place.
+      const isValidationError = Boolean(err.fieldErrors && Object.keys(err.fieldErrors).length);
+      setReviewError(isValidationError ? t('reviewError') : (err.message || t('reviewError')));
     } finally {
       setSubmittingReview(false);
     }
   };
+
+  // Métadonnées de la page : nom de l'activité dans l'onglet et au partage
+  usePageMeta({
+    title: business ? `${business.name}${business.city?.name ? ` — ${business.city.name}` : ''}` : null,
+    description: business?.shortDesc || business?.description?.slice(0, 160),
+    image: business?.coverImage || business?.logo,
+  });
 
   const userHasReviewed = reviews.some(r => r.user?.id === user?.id);
   const allImages = business ? [business.coverImage, ...(business.images || [])].filter(Boolean) : [];
@@ -144,7 +177,7 @@ const BusinessDetail = () => {
     return (
       <div className="bd-loading">
         <div className="spinner"></div>
-        <p>Caricamento attività…</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }
@@ -152,22 +185,24 @@ const BusinessDetail = () => {
   if (error || !business) {
     return (
       <div className="bd-error">
-        <p><Icon name="alert" size={18} /> {error || 'Attività non trovata.'}</p>
-        <button onClick={() => navigate('/dashboard')} className="bd-back-btn">← Torna alla directory</button>
+        <p><Icon name="alert" size={18} /> {error || t('notFound')}</p>
+        <button onClick={() => navigate('/dashboard')} className="bd-back-btn">{t('backToDirectory')}</button>
       </div>
     );
   }
 
   const hasCoords = business.latitude && business.longitude;
+  // Il proprietario non vede il riquadro di rivendicazione
+  const isOwner = isAuthenticated && business.owner?.id && business.owner.id === user?.id;
 
   return (
     <div className="bd-page">
       {/* Back nav */}
       <div className="bd-nav">
         <button onClick={() => navigate('/dashboard')} className="bd-back-link">
-          ← Directory
+          {t('directory')}
         </button>
-        <span className="bd-breadcrumb">{business.category?.name} / {business.city?.name}</span>
+        <span className="bd-breadcrumb">{getCategoryLabel(business.category, language)} / {business.city?.name}</span>
       </div>
 
       {/* Cover + gallery */}
@@ -211,12 +246,12 @@ const BusinessDetail = () => {
                 )}
               </div>
               <div className="bd-meta-row">
-                <span className="bd-cat-badge">{business.category?.name}</span>
+                <span className="bd-cat-badge">{getCategoryLabel(business.category, language)}</span>
                 <span className="bd-city"><Icon name="pin" size={14} /> {business.address}, {business.city?.name}</span>
                 <div className="bd-rating-summary">
                   <StarRating rating={business.averageRating || 0} size="sm" />
                   <span className="bd-rating-num">{(business.averageRating || 0).toFixed(1)}</span>
-                  <span className="bd-rating-count">({business.reviewCount || 0} recensioni)</span>
+                  <span className="bd-rating-count">({business.reviewCount || 0} {t('reviewsCount')})</span>
                 </div>
               </div>
             </div>
@@ -225,13 +260,13 @@ const BusinessDetail = () => {
             <button
               className={`bd-fav-btn ${isFavorite ? 'active' : ''}`}
               onClick={handleFavorite}
-              title={isFavorite ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+              title={isFavorite ? t('removeFavorite') : t('addFavorite')}
             >
               <Icon name="heart" size={20} />
             </button>
             {business.phone && (
               <a href={`tel:${business.phone}`} className="bd-contact-btn bd-phone">
-                <Icon name="phone" size={15} /> Chiama
+                <Icon name="phone" size={15} /> {t('call')}
               </a>
             )}
             {business.whatsapp && (
@@ -257,9 +292,9 @@ const BusinessDetail = () => {
               className={`bd-tab ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab === 'info' && 'Informazioni'}
-              {tab === 'recensioni' && `Recensioni (${business.reviewCount || 0})`}
-              {tab === 'mappa' && 'Mappa'}
+              {tab === 'info' && t('tabInfo')}
+              {tab === 'recensioni' && `${t('tabReviews')} (${business.reviewCount || 0})`}
+              {tab === 'mappa' && t('tabMap')}
             </button>
           ))}
         </div>
@@ -274,18 +309,47 @@ const BusinessDetail = () => {
             <div className="bd-info-grid">
               <div className="bd-info-main">
                 <section className="bd-section">
-                  <h2>Chi siamo</h2>
+                  <h2>{t('about')}</h2>
                   <p className="bd-description">{business.description}</p>
+                  {/* Condivisione: fondamentale per la diffusione passaparola */}
+                  <ShareButtons business={business} />
                 </section>
+
+                {/* ── « È la tua attività? » — rivendicazione della scheda ── */}
+                {!isOwner && (
+                  <section className="bd-claim">
+                    {myClaim?.status === 'PENDING' ? (
+                      <p className="bd-claim__status bd-claim__status--pending">
+                        <Icon name="clock" size={16} /> {t('claimPending')}
+                      </p>
+                    ) : (
+                      <>
+                        <div className="bd-claim__text">
+                          <h3><Icon name="shield" size={16} /> {t('claimTitle')}</h3>
+                          <p>{t('claimIntro')}</p>
+                          {myClaim?.status === 'REJECTED' && (
+                            <p className="bd-claim__rejected">{t('claimRejected')}</p>
+                          )}
+                        </div>
+                        <button
+                          className="bd-claim__btn"
+                          onClick={() => isAuthenticated ? setClaimOpen(true) : navigate('/login')}
+                        >
+                          {isAuthenticated ? t('claimButton') : t('claimLoginFirst')}
+                        </button>
+                      </>
+                    )}
+                  </section>
+                )}
 
                 {/* Social */}
                 {(business.facebook || business.instagram || business.twitter || business.tiktok || business.website) && (
                   <section className="bd-section">
-                    <h2>Seguici</h2>
+                    <h2>{t('followUs')}</h2>
                     <div className="bd-socials">
                       {business.website && (
                         <a href={business.website} target="_blank" rel="noopener noreferrer" className="bd-social-link web">
-                          <Icon name="globe" size={15} /> Sito web
+                          <Icon name="globe" size={15} /> {t('websiteLink')}
                         </a>
                       )}
                       {business.instagram && (
@@ -311,7 +375,7 @@ const BusinessDetail = () => {
               <div className="bd-info-sidebar">
                 {/* Contact card */}
                 <div className="bd-sidebar-card">
-                  <h3>Contatti</h3>
+                  <h3>{t('contacts')}</h3>
                   {business.phone && (
                     <div className="bd-contact-row">
                       <span><Icon name="phone" size={16} /></span>
@@ -335,15 +399,15 @@ const BusinessDetail = () => {
                 {/* Hours */}
                 {business.hours && (
                   <div className="bd-sidebar-card">
-                    <h3>Orari</h3>
+                    <h3>{t('hours')}</h3>
                     <div className="bd-hours">
                       {Object.entries(business.hours).map(([day, times]) => (
                         <div key={day} className="bd-hours-row">
-                          <span className="bd-hours-day">{DAYS_IT[day] || day}</span>
+                          <span className="bd-hours-day">{DAY_KEYS.includes(day) ? t(day) : day}</span>
                           <span className="bd-hours-time">
                             {times?.open && times?.close
                               ? `${times.open} – ${times.close}`
-                              : <em className="bd-closed">Chiuso</em>
+                              : <em className="bd-closed">{t('closed')}</em>
                             }
                           </span>
                         </div>
@@ -364,7 +428,7 @@ const BusinessDetail = () => {
               <div className="bd-avg-score">{(business.averageRating || 0).toFixed(1)}</div>
               <div>
                 <StarRating rating={business.averageRating || 0} size="lg" />
-                <p className="bd-review-total">{business.reviewCount || 0} recensioni</p>
+                <p className="bd-review-total">{business.reviewCount || 0} {t('reviewsCount')}</p>
               </div>
             </div>
 
@@ -373,18 +437,18 @@ const BusinessDetail = () => {
               <div className="bd-write-review">
                 {!showReviewForm ? (
                   <button className="bd-write-btn" onClick={() => setShowReviewForm(true)}>
-                    <Icon name="pen" size={15} /> Scrivi una recensione
+                    <Icon name="pen" size={15} /> {t('writeReview')}
                   </button>
                 ) : (
                   <form className="bd-review-form" onSubmit={handleSubmitReview}>
-                    <h3>La tua recensione</h3>
+                    <h3>{t('yourReview')}</h3>
                     <div className="bd-review-form-rating">
-                      <label>Valutazione</label>
+                      <label>{t('rating')}</label>
                       <StarPicker value={reviewRating} onChange={setReviewRating} />
                     </div>
                     <textarea
                       className="bd-review-textarea"
-                      placeholder="Condividi la tua esperienza con la community…"
+                      placeholder={t('reviewPlaceholder')}
                       value={reviewComment}
                       onChange={e => setReviewComment(e.target.value)}
                       rows={4}
@@ -394,10 +458,10 @@ const BusinessDetail = () => {
                     {reviewSuccess && <p className="bd-form-success">{reviewSuccess}</p>}
                     <div className="bd-review-form-actions">
                       <button type="button" className="bd-cancel-btn" onClick={() => setShowReviewForm(false)}>
-                        Annulla
+                        {t('cancel')}
                       </button>
                       <button type="submit" className="bd-submit-btn" disabled={submittingReview}>
-                        {submittingReview ? 'Pubblicazione…' : 'Pubblica'}
+                        {submittingReview ? t('publishing') : t('publish')}
                       </button>
                     </div>
                   </form>
@@ -408,8 +472,8 @@ const BusinessDetail = () => {
             {!isAuthenticated && (
               <div className="bd-login-prompt">
                 <p>
-                  <button className="bd-login-link" onClick={() => navigate('/login')}>Accedi</button>
-                  {' '}per lasciare una recensione.
+                  <button className="bd-login-link" onClick={() => navigate('/login')}>{t('login')}</button>
+                  {' '}{t('loginToReview')}
                 </p>
               </div>
             )}
@@ -419,7 +483,7 @@ const BusinessDetail = () => {
             {/* Reviews list */}
             {reviews.length === 0 ? (
               <div className="bd-no-reviews">
-                <p>Nessuna recensione ancora. Sii il primo!</p>
+                <p>{t('noReviews')}</p>
               </div>
             ) : (
               <div className="bd-reviews-list">
@@ -447,7 +511,7 @@ const BusinessDetail = () => {
                     <p className="bd-review-comment">{review.comment}</p>
                     {review.response && (
                       <div className="bd-owner-response">
-                        <strong>Risposta del proprietario:</strong>
+                        <strong>{t('ownerResponse')}</strong>
                         <p>{review.response}</p>
                       </div>
                     )}
@@ -487,12 +551,21 @@ const BusinessDetail = () => {
               </div>
             ) : (
               <div className="bd-no-map">
-                <p><Icon name="map" size={16} /> Coordinate GPS non disponibili per questa attività.</p>
+                <p><Icon name="map" size={16} /> {t('noCoords')}</p>
               </div>
             )}
           </div>
         )}
       </div>
+
+      {/* Modale di rivendicazione della scheda */}
+      <ClaimModal
+        open={claimOpen}
+        business={business}
+        user={user}
+        onClose={() => setClaimOpen(false)}
+        onSubmitted={() => loadMyClaim(business.id)}
+      />
     </div>
   );
 };

@@ -1,331 +1,520 @@
-# 🚀 Guide Complet - Lancer l'Application AfroItalia
+# AfroItalia — Full Application Guide
 
-Ce guide explique comment démarrer l'application complète avec le frontend (React) et le backend (API Docker).
-
-## 📋 Architecture de l'Application
-
-```
-┌─────────────────────────────────────────────────┐
-│                                                 │
-│  Frontend React (Port 3000)                    │
-│  http://localhost:3000                         │
-│                                                 │
-└────────────────┬────────────────────────────────┘
-                 │
-                 │ API Calls
-                 ▼
-┌─────────────────────────────────────────────────┐
-│         Backend Docker Services                 │
-│                                                 │
-│  ┌──────────────────┐  ┌──────────────────┐   │
-│  │   PostgreSQL     │  │      Redis       │   │
-│  │   Port: 5432     │  │   Port: 6379     │   │
-│  └──────────────────┘  └──────────────────┘   │
-│                                                 │
-│  ┌──────────────────┐  ┌──────────────────┐   │
-│  │   API Node.js    │  │  Prisma Studio   │   │
-│  │   Port: 5001     │  │   Port: 5555     │   │
-│  └──────────────────┘  └──────────────────┘   │
-│                                                 │
-└─────────────────────────────────────────────────┘
-```
-
-## 🎯 Démarrage Rapide (2 Terminaux)
-
-### Terminal 1: Backend (Docker)
-
-```bash
-# Aller dans le dossier server
-cd server
-
-# Démarrer tous les services Docker
-npm run docker:up
-
-# Attendre que tous les services démarrent (30 secondes)
-# Vérifier que tout est OK
-docker-compose ps
-```
-
-### Terminal 2: Frontend (React)
-
-```bash
-# Aller dans le dossier client
-cd client
-
-# Installer les dépendances (première fois seulement)
-npm install
-
-# Démarrer le serveur de développement React
-npm start
-```
-
-## ✅ Vérification
-
-Après avoir lancé les deux commandes, vous devriez avoir :
-
-### Backend (Docker)
-- ✅ **PostgreSQL** - localhost:5432
-- ✅ **Redis** - localhost:6379
-- ✅ **API** - http://localhost:5001/health
-- ✅ **Prisma Studio** - http://localhost:5555
-
-### Frontend (React)
-- ✅ **Application Web** - http://localhost:3000
-
-## 🌐 Accéder à l'Application
-
-Ouvrez votre navigateur et allez sur :
-
-### **http://localhost:3000**
-
-Vous devriez voir la page d'accueil d'AfroItalia ! 🎉
-
-## 🔑 Se Connecter
-
-Utilisez ces identifiants de test :
-
-```
-Email: admin@afroitalia.com
-Password: password123
-
-Autres comptes:
-- john@example.com (USER)
-- owner@example.com (BUSINESS)
-```
-
-## 📁 Structure du Projet
-
-```
-afro-italia-v2/
-├── client/              # Frontend React
-│   ├── src/            # Code source React
-│   ├── public/         # Assets statiques
-│   └── package.json    # Dépendances frontend
-│
-├── server/             # Backend API
-│   ├── src/           # Code source API
-│   ├── prisma/        # Schéma de base de données
-│   ├── Dockerfile     # Configuration Docker
-│   └── docker-compose.yml
-│
-└── FULL_APP_GUIDE.md  # Ce fichier
-```
-
-## 🛠️ Commandes Utiles
-
-### Backend (depuis /server)
-
-```bash
-# Démarrer Docker
-npm run docker:up
-
-# Arrêter Docker
-npm run docker:down
-
-# Voir les logs
-npm run docker:logs
-
-# Accéder à Prisma Studio
-http://localhost:5555
-
-# Restart API
-docker-compose restart api
-
-# Seed la base de données
-npm run docker:seed
-```
-
-### Frontend (depuis /client)
-
-```bash
-# Démarrer le serveur de dev
-npm start
-
-# Build pour la production
-npm run build
-
-# Lancer les tests
-npm test
-```
-
-## 🐛 Problèmes Courants
-
-### Le frontend ne se connecte pas à l'API
-
-**Vérifiez** :
-1. Le backend Docker est démarré : `docker-compose ps`
-2. L'API répond : `curl http://localhost:5001/health`
-3. Le fichier `client/.env` existe avec `REACT_APP_API_URL=http://localhost:5001/api`
-
-**Solution** :
-```bash
-# Dans le dossier client
-cat .env | grep REACT_APP_API_URL
-# Doit afficher: REACT_APP_API_URL=http://localhost:5001/api
-
-# Si différent, corrigez le fichier .env
-```
-
-### Port 3000 déjà utilisé
-
-```bash
-# Trouver le processus utilisant le port 3000
-lsof -i :3000
-
-# Tuer le processus
-kill -9 <PID>
-
-# Ou changer le port
-PORT=3001 npm start
-```
-
-### Erreur CORS sur l'API
-
-L'API est configurée pour accepter les requêtes depuis `http://localhost:3000`. Si vous changez le port du frontend, mettez à jour `server/.env` :
-
-```bash
-CLIENT_URL=http://localhost:3001
-```
-
-Puis redémarrez l'API :
-```bash
-docker-compose restart api
-```
-
-### Page blanche ou erreur React
-
-```bash
-# Nettoyer et réinstaller
-cd client
-rm -rf node_modules package-lock.json
-npm install
-npm start
-```
-
-## 🔄 Workflow de Développement
-
-### 1. Démarrage Quotidien
-
-```bash
-# Terminal 1: Backend
-cd server && npm run docker:up
-
-# Terminal 2: Frontend
-cd client && npm start
-```
-
-### 2. Pendant le Développement
-
-- **Frontend** : Les modifications dans `client/src/` rechargent automatiquement le navigateur (hot reload)
-- **Backend** : Les modifications dans `server/src/` redémarrent automatiquement l'API (nodemon)
-
-### 3. Tester les Changements
-
-```bash
-# Ouvrir http://localhost:3000
-# Modifier du code
-# Les changements apparaissent automatiquement
-```
-
-### 4. Arrêt en Fin de Journée
-
-```bash
-# Arrêter le frontend
-Ctrl + C dans le terminal du client
-
-# Arrêter le backend
-cd server && npm run docker:down
-```
-
-## 📊 Outils de Développement
-
-### Prisma Studio (Base de Données)
-http://localhost:5555
-- Voir toutes les tables
-- Ajouter/Modifier/Supprimer des données
-- Tester les relations
-
-### React DevTools
-Installez l'extension Chrome/Firefox pour débugger React :
-- [React Developer Tools](https://react.dev/learn/react-developer-tools)
-
-### API Testing
-Utilisez **Postman** ou **Insomnia** pour tester l'API :
-- Base URL : `http://localhost:5001/api`
-- Exemple : `GET http://localhost:5001/api/businesses`
-
-## 🎨 Personnalisation
-
-### Changer le Nom de l'Application
-
-Éditez `client/.env` :
-```bash
-REACT_APP_NAME=VotreNom
-REACT_APP_DESCRIPTION="Votre description"
-```
-
-### Activer/Désactiver des Fonctionnalités
-
-Dans `client/.env` :
-```bash
-REACT_APP_ENABLE_REVIEWS=true
-REACT_APP_ENABLE_CHAT=false
-REACT_APP_ENABLE_EVENTS=false
-```
-
-## 🚀 Déploiement en Production
-
-### Frontend (Vercel/Netlify)
-
-```bash
-cd client
-npm run build
-# Le dossier build/ contient l'application prête pour la production
-```
-
-### Backend (Docker en Production)
-
-Consultez `server/DOCKER.md` pour les instructions de déploiement.
-
-## 📚 Documentation Complète
-
-- **Backend API** : Consultez `server/README.md`
-- **Docker Setup** : Consultez `server/DOCKER.md`
-- **Quick Start** : Consultez `server/DOCKER-QUICKSTART.md`
-
-## 💡 Astuces
-
-### Développement Parallèle Frontend + Backend
-
-```bash
-# Script pratique pour tout démarrer
-# Créez un fichier start.sh à la racine
-
-#!/bin/bash
-cd server && npm run docker:up &
-sleep 10
-cd client && npm start
-```
-
-### Vérification Rapide
-
-```bash
-# Vérifier que tout fonctionne
-curl http://localhost:5001/health  # Backend
-curl http://localhost:3000         # Frontend
-curl http://localhost:5555         # Prisma Studio
-```
-
-## ❓ Support
-
-Si vous rencontrez des problèmes :
-
-1. **Backend** : Vérifiez `docker-compose logs api`
-2. **Frontend** : Vérifiez la console du navigateur (F12)
-3. **Database** : Utilisez Prisma Studio sur http://localhost:5555
+Everything you need to run, understand and work on the platform.
 
 ---
 
-**🎉 Bon développement avec AfroItalia !** 🚀
+## Table of contents
 
-*Dernière mise à jour : Mai 2026*
+1. [What the platform does](#1-what-the-platform-does)
+2. [Architecture](#2-architecture)
+3. [Tech stack](#3-tech-stack)
+4. [Running the app locally](#4-running-the-app-locally)
+5. [Project structure](#5-project-structure)
+6. [Data model](#6-data-model)
+7. [API reference](#7-api-reference)
+8. [Key features explained](#8-key-features-explained)
+9. [Internationalisation](#9-internationalisation)
+10. [Testing](#10-testing)
+11. [Common tasks](#11-common-tasks)
+12. [Troubleshooting](#12-troubleshooting)
+
+---
+
+## 1. What the platform does
+
+AfroItalia is a **directory of African diaspora businesses in Italy** —
+restaurants, hairdressers, grocery stores, fashion, beauty and services.
+
+**Three kinds of users:**
+
+- **Visitors** browse the directory, search by city and category, read reviews.
+  No account required.
+- **Registered users** save favourites, write reviews, and publish their own
+  business.
+- **Administrators** verify submitted businesses, moderate reported reviews,
+  manage users and approve ownership claims.
+
+The interface is available in **Italian, French and English**, with a dark and
+a light theme.
+
+---
+
+## 2. Architecture
+
+```
+                        ┌──────────────────────────┐
+   Browser ────────────►│  React SPA (client/)     │
+                        │  Vercel                  │
+                        └────────────┬─────────────┘
+                                     │  REST calls (fetch)
+                                     ▼
+                        ┌──────────────────────────┐
+                        │  Express API (server/)   │
+                        │  Railway                 │
+                        └────────────┬─────────────┘
+                                     │  Prisma ORM
+                                     ▼
+                        ┌──────────────────────────┐
+                        │  PostgreSQL              │
+                        └──────────────────────────┘
+
+   External services:
+   • OpenStreetMap  — map tiles (Leaflet)
+   • Nominatim      — address → GPS coordinates
+   • Google OAuth   — "Sign in with Google"
+   • SMTP (Brevo)   — transactional emails
+```
+
+The frontend and the backend are **fully decoupled**: the API only returns
+JSON, and the React app is a static bundle. They can be deployed, scaled and
+restarted independently.
+
+---
+
+## 3. Tech stack
+
+### Frontend (`client/`)
+
+| Technology | Purpose |
+|---|---|
+| **React 18** | UI, single-page application |
+| **React Router 6** | Client-side routing |
+| **Zustand** | Authentication state (lightweight alternative to Redux) |
+| **Leaflet + react-leaflet** | Interactive maps with OpenStreetMap tiles |
+| **libphonenumber-js** | Phone formatting and validation for ~245 countries |
+| **Plain CSS with variables** | Theming (dark/light), no CSS framework |
+| **Native `fetch`** | HTTP calls (no axios) |
+
+### Backend (`server/`)
+
+| Technology | Purpose |
+|---|---|
+| **Node.js + Express** | REST API |
+| **Prisma ORM** | Database access, migrations, type safety |
+| **PostgreSQL** | Relational database |
+| **JWT (jsonwebtoken)** | Stateless authentication |
+| **bcryptjs** | Password hashing |
+| **Helmet, CORS, express-rate-limit** | Security hardening |
+| **express-validator** | Request payload validation |
+| **Nodemailer** | Transactional emails |
+| **Jest + Supertest** | Automated tests (62 tests) |
+
+### Tooling
+
+Docker Compose for local PostgreSQL, ESLint via `react-scripts`, and two
+custom scripts: `check:i18n` (translation coverage) and `db:seed:cities`.
+
+---
+
+## 4. Running the app locally
+
+### Prerequisites
+
+- **Node.js 18+**
+- **Docker Desktop** (for the local database)
+
+### First-time setup
+
+```bash
+# 1. Install dependencies
+cd server && npm install
+cd ../client && npm install
+
+# 2. Create the environment files
+cd ../server && cp .env.example .env
+cd ../client && cp .env.example .env
+
+# 3. Generate a JWT secret and paste it into server/.env
+node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+
+# 4. Start the database
+cd ../server && docker compose up -d postgres
+
+# 5. Create the tables
+npx prisma migrate dev --name init
+
+# 6. Load the data
+npm run db:seed              # categories + demo accounts
+npm run db:seed:cities       # 107 Italian provincial capitals
+node prisma/seeds/businesses-reali.js   # 53 real businesses
+```
+
+### Daily use
+
+```bash
+# Terminal 1 — database
+cd server && docker compose up -d postgres
+
+# Terminal 2 — API  → http://localhost:5000
+cd server && npm run dev
+
+# Terminal 3 — website → http://localhost:3000
+cd client && npm start
+```
+
+### Demo accounts (development only)
+
+| Email | Password | Role |
+|---|---|---|
+| `admin@afroitalia.com` | `password123` | ADMIN |
+| `john@example.com` | `password123` | USER |
+| `owner@example.com` | `password123` | BUSINESS |
+
+> These accounts are **never created in production** — the seed script skips
+> them when `NODE_ENV=production`.
+
+---
+
+## 5. Project structure
+
+```
+afro-italia-v2/
+├── client/                        React application
+│   ├── public/
+│   │   ├── index.html
+│   │   └── robots.txt             Search engine rules
+│   ├── scripts/
+│   │   └── check-i18n.js          Verifies translation completeness
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── auth/              Route guards (ProtectedRoute, AdminRoute)
+│   │   │   ├── business/          ClaimModal, ShareButtons
+│   │   │   ├── common/            Icon, ChatBot, CitySelect, PhoneInput…
+│   │   │   └── layout/            Header, Footer
+│   │   ├── contexts/              Language, Theme, Toast
+│   │   ├── data/                  Chatbot FAQ, legal texts
+│   │   ├── hooks/                 usePageMeta (SEO)
+│   │   ├── locales/               translations.js — all UI strings
+│   │   ├── pages/                 One file per screen
+│   │   ├── services/              API layer (api, business, admin, geocoding)
+│   │   ├── stores/                authStore (Zustand)
+│   │   └── styles/                One CSS file per page/component
+│   └── vercel.json                SPA rewrites + security headers
+│
+├── server/                        Express API
+│   ├── prisma/
+│   │   ├── schema.prisma          Data model
+│   │   ├── seed.js                Categories, cities, admin account
+│   │   └── seeds/
+│   │       ├── cities-italia.js   107 provincial capitals
+│   │       └── businesses-reali.js  Real business census
+│   ├── src/
+│   │   ├── config/checkEnv.js     Refuses unsafe production config
+│   │   ├── controllers/           Business logic
+│   │   ├── middleware/            auth, validation, rate limiting, errors
+│   │   ├── routes/                URL → controller mapping
+│   │   ├── services/              emailService
+│   │   ├── utils/                 errorResponse
+│   │   ├── app.js                 Express setup
+│   │   └── server.js              Entry point
+│   ├── tests/                     Jest + Supertest
+│   └── docker-compose.yml
+│
+├── DEPLOYMENT.md                  Step-by-step deployment guide
+├── FULL_APP_GUIDE.md              This document
+└── README.md                      Quick overview
+```
+
+---
+
+## 6. Data model
+
+Seven tables, managed by Prisma:
+
+```
+User ──────< Business >────── City
+ │              │  │
+ │              │  └───────── Category
+ │              │
+ ├──< Review >──┤
+ ├──< Favorite >┤
+ └──< BusinessClaim >
+```
+
+| Table | Purpose |
+|---|---|
+| **User** | Accounts. Roles: `USER`, `BUSINESS`, `ADMIN` |
+| **City** | 107 Italian provincial capitals, with GPS coordinates |
+| **Category** | Restaurant, hairdresser, grocery, fashion, beauty, services |
+| **Business** | The listings. Status: `PENDING` → `VERIFIED` / `REJECTED` / `SUSPENDED` |
+| **Review** | Rating 1-5 + comment, one per user per business, owner can reply |
+| **Favorite** | Saved businesses |
+| **BusinessClaim** | "This is my business" requests, approved by an admin |
+
+A new business is always created as `PENDING` and only appears publicly once an
+administrator verifies it.
+
+### Single source of truth
+
+`server/prisma/schema.prisma` is the **only** definition of the database.
+Everything else is derived from it: the tables, the migrations, and the
+generated client.
+
+Do not maintain a `.sql` file by hand alongside it — the two will drift apart
+silently, and someone will eventually run the wrong one. If you need the raw
+SQL (for review, documentation or an audit), generate it on demand:
+
+```bash
+cd server && npm run db:sql            # prints the SQL to the terminal
+cd server && npm run db:sql > schema.sql   # or into a file, then delete it
+```
+
+The output always reflects the current schema, so it can never be out of date.
+
+---
+
+## 7. API reference
+
+Base URL: `http://localhost:5000/api`
+
+### Public — no authentication
+
+```
+GET    /businesses                 Paginated list (filters: city, category, page, limit)
+GET    /businesses/search?q=       Case-insensitive search
+GET    /businesses/:slug           Single business (increments view count)
+GET    /reviews/:businessId        Reviews of a business
+GET    /meta/cities                All active cities
+GET    /meta/categories            All categories
+GET    /health                     Health check
+GET    /sitemap.xml                Sitemap for search engines
+```
+
+### Authentication
+
+```
+POST   /auth/register              Sign up (sends welcome email)
+POST   /auth/login                 Sign in → JWT
+POST   /auth/google                Google OAuth
+GET    /auth/me                    Current profile               [auth]
+POST   /auth/forgot-password       Sends a reset link
+POST   /auth/reset-password/:token Sets a new password
+```
+
+### Authenticated users
+
+```
+POST   /businesses                 Create a listing (status PENDING)
+PUT    /businesses/:id             Update (owner only)
+DELETE /businesses/:id             Delete (owner only)
+POST   /businesses/:id/favorite    Toggle favourite
+GET    /businesses/my/list         My businesses
+POST   /businesses/:id/claim       Claim a listing
+GET    /businesses/:id/claim/me    Status of my claim
+POST   /reviews                    Write a review
+PUT    /reviews/:id                Edit my review
+POST   /reviews/:id/response       Owner reply
+PATCH  /reviews/:id/report         Report a review
+GET    /users/favorites            My favourites
+GET    /users/my-reviews           My reviews
+```
+
+### Administrators
+
+```
+GET    /admin/stats                Dashboard counters
+GET    /admin/businesses           All listings (filter by status)
+GET    /admin/users                All users
+PATCH  /admin/users/:id/role       Change a role
+GET    /admin/reviews/reported     Reported reviews
+GET    /admin/claims               Ownership claims
+PATCH  /admin/claims/:id           Approve / reject a claim
+PATCH  /businesses/:id/verify      Verify a listing (sends an email)
+PATCH  /businesses/:id/status      Change status (sends an email)
+```
+
+**Authentication:** send the token in the header —
+`Authorization: Bearer <token>`
+
+---
+
+## 8. Key features explained
+
+### Automatic address geocoding
+
+On the "publish a business" form, typing an address places the map pin
+automatically. The address is sent to **Nominatim** (OpenStreetMap) 800 ms
+after you stop typing, scoped to Italy.
+
+If you drag the pin manually, automatic search stops overriding your choice
+until you edit the address again. In edit mode, the first search is skipped so
+the saved position is preserved.
+
+### Business ownership claims
+
+Listings from the census belong to a placeholder account. A real owner opens
+the listing, clicks **"Claim this business"**, and fills in a short form.
+
+The request appears in the admin **Claims** tab. On approval, three things
+happen in a single transaction: the listing is transferred, the user's role
+becomes `BUSINESS`, and competing claims are auto-rejected. The requester
+receives an email either way.
+
+### International phone input
+
+A country selector (flag + dial code, searchable across ~245 countries) sits
+next to the number field. Digits are formatted live according to the selected
+country — `3331234567` becomes `333 123 4567` for Italy, `(202) 555-0123` for
+the US. The value is stored in **E.164** format (`+393331234567`).
+
+Validation uses the real numbering plan of each country, so landlines are
+accepted (a common failure of naive phone validation).
+
+### Support chatbot
+
+A floating widget with **nine predefined questions and answers** in three
+languages, matched by keyword. No external AI service, no API cost — the
+answers live in `client/src/data/chatbotFaq.js`.
+
+### Emails
+
+Four transactional emails, all trilingual: welcome, password reset, business
+approved/rejected, and claim approved/rejected. Without SMTP configured, they
+are printed to the console instead of being sent — development never breaks.
+
+---
+
+## 9. Internationalisation
+
+All UI strings live in a single file: `client/src/locales/translations.js`,
+structured as `key: { en, fr, it }`.
+
+```js
+import { getTranslation } from '../locales/translations';
+const t = (path) => getTranslation(path, language);
+
+t('app.activities.heroTitle')   // → "Discover diaspora businesses"
+```
+
+The chosen language is stored in `localStorage` and sets the `<html lang>`
+attribute automatically.
+
+**Before committing translation changes, run:**
+
+```bash
+cd client && npm run check:i18n
+```
+
+It verifies that every key exists in all three languages and that every
+`t('…')` call in the code points to a key that actually exists. It exits with
+an error code, so it can be wired into CI.
+
+---
+
+## 10. Testing
+
+```bash
+cd server && npm test
+```
+
+**62 tests** across six suites:
+
+| Suite | What it covers |
+|---|---|
+| `auth.test.js` | Registration, login, invalid credentials |
+| `businesses.test.js` | Listing, pagination, filters, detail, 404 |
+| `reviews.test.js` | Reviews, permissions, validation |
+| `claims.test.js` | Ownership claims, admin approval, public access |
+| `validation.test.js` | Italian phone formats, URLs, required fields |
+| `sitemap.test.js` | XML validity, health check, error handling |
+
+Tests run against a **mocked Prisma client**, so no database is needed. They
+are fast (~2 seconds) and safe to run anywhere.
+
+---
+
+## 11. Common tasks
+
+### Add a translated string
+
+1. Add the key in `client/src/locales/translations.js` with `en`, `fr`, `it`
+2. Use it: `t('app.section.myKey')`
+3. Verify: `npm run check:i18n`
+
+### Add an API endpoint
+
+1. Add the method in `server/src/controllers/xxxController.js`
+2. Register the route in `server/src/routes/xxx.js`
+3. Add validation in `server/src/middleware/validation.js` if it takes a body
+4. Write a test in `server/tests/`
+
+### Change the database structure
+
+```bash
+# 1. Edit server/prisma/schema.prisma
+cd server
+npx prisma migrate dev --name describe_your_change
+# 2. Commit the generated migration folder
+```
+
+### Add a city
+
+Cities come from the database. Add an entry to
+`server/prisma/seeds/cities-italia.js` and re-run `npm run db:seed:cities`.
+The script is idempotent — it will not create duplicates.
+
+### Inspect the database visually
+
+```bash
+cd server && npx prisma studio     # opens http://localhost:5555
+```
+
+---
+
+## 12. Troubleshooting
+
+### `Can't reach database server at localhost:5432`
+
+The PostgreSQL container is not running:
+
+```bash
+cd server && docker compose up -d postgres
+```
+
+Make sure Docker Desktop itself is started.
+
+### `Table does not exist`
+
+The tables have not been created yet:
+
+```bash
+cd server && npx prisma migrate dev
+```
+
+### The website loads but no data appears
+
+Check the browser console (F12). A `CORS` error means `CLIENT_URL` in
+`server/.env` does not match the address you are browsing from.
+
+Also verify `REACT_APP_API_URL` in `client/.env` — it must end with `/api`.
+
+### Prisma errors after changing the schema
+
+Regenerate the client:
+
+```bash
+cd server && npx prisma generate
+```
+
+### `Too many requests`
+
+The brute-force protection triggered (5 login attempts per 15 minutes). Wait,
+or set `NODE_ENV=development` locally, which disables the limiter.
+
+### Emails are not sent
+
+Expected in development. If you see
+`📧 [EMAIL - dev mode, SMTP not configured]` in the logs, everything is
+working as intended — configure `SMTP_*` variables to send real emails.
+
+---
+
+## Where to go next
+
+- **Deploying online** → see `DEPLOYMENT.md`
+- **Docker details** → see `server/DOCKER.md`
+
+---
+
+*AfroItalia — full application guide, August 2026*

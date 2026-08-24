@@ -4,15 +4,19 @@
 // I dati sono salvati come "business" (stato PENDING → moderazione admin).
 // ============================================
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef, useCallback } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import businessService from '../services/businessService';
+import { geocodeAddress, cancelGeocoding } from '../services/geocodingService';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
 import Icon from '../components/common/Icon';
+import CitySelect from '../components/common/CitySelect';
+import { getCategoryLabel } from '../utils/categoryLabel';
+import PhoneInput from '../components/common/PhoneInput';
 import '../styles/AddService.css';
 
 // Fix icone Leaflet (path di default rotto con i bundler)
@@ -74,6 +78,14 @@ const AddService = () => {
     coverImage: '',
   });
   const [position, setPosition] = useState(null); // [lat, lng]
+  // Stato della ricerca automatica dell'indirizzo:
+  // 'idle' | 'searching' | 'found' | 'notfound' | 'error'
+  const [geoStatus, setGeoStatus] = useState('idle');
+  // Se l'utente sposta il segnaposto a mano, non lo sovrascriviamo
+  // finché non modifica di nuovo l'indirizzo.
+  const pinMovedManually = useRef(false);
+  // In modifica: salta la prima ricerca per non spostare la posizione salvata
+  const skipNextGeocode = useRef(isEdit);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState(null);
@@ -139,14 +151,88 @@ const AddService = () => {
   );
   const mapCenter = position
     || (selectedCity ? [selectedCity.latitude, selectedCity.longitude] : ITALY_CENTER);
-  const mapZoom = position ? 15 : (selectedCity ? 12 : 6);
+  const mapZoom = position ? 16 : (selectedCity ? 12 : 6);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     setServerError(null);
+    // Modificando l'indirizzo la ricerca automatica torna attiva
+    if (name === 'address') pinMovedManually.current = false;
   };
+
+  // Telefono / WhatsApp: il componente restituisce già il formato E.164.
+  // Teniamo traccia della validità per segnalarla prima dell'invio.
+  const [phoneValidity, setPhoneValidity] = useState({ phone: true, whatsapp: true });
+
+  const handlePhoneChange = useCallback((field, e164, meta) => {
+    setForm(prev => ({ ...prev, [field]: e164 }));
+    setPhoneValidity(prev => ({ ...prev, [field]: !e164 || meta.isValid }));
+    setErrors(prev => (prev[field] ? { ...prev, [field]: '' } : prev));
+    setServerError(null);
+  }, []);
+
+  // Segnaposto spostato/cliccato a mano: la ricerca automatica non lo tocca più
+  const handlePinChange = useCallback((coords) => {
+    pinMovedManually.current = true;
+    setGeoStatus('idle');
+    setPosition(coords);
+  }, []);
+
+  // ── Ricerca automatica dell'indirizzo (debounce) ──
+  // Quando cambiano indirizzo o città, cerca le coordinate e sposta il segnaposto.
+  const address = form.address;
+  const cityName = selectedCity?.name;
+
+  useEffect(() => {
+    // In modifica, non sovrascrivere la posizione già salvata al primo render
+    if (skipNextGeocode.current) {
+      skipNextGeocode.current = false;
+      return;
+    }
+    // Il segnaposto è stato messo a mano: rispettiamo la scelta dell'utente
+    if (pinMovedManually.current) return;
+
+    const street = (address || '').trim();
+    if (!street || !cityName) {
+      setGeoStatus('idle');
+      return;
+    }
+    // Sotto i 3 caratteri la ricerca non è significativa
+    if (street.length < 3) {
+      setGeoStatus('idle');
+      return;
+    }
+
+    let cancelled = false;
+    setGeoStatus('searching');
+
+    // Debounce: rispetta il limite di ~1 richiesta/secondo di Nominatim
+    const timer = setTimeout(async () => {
+      try {
+        const result = await geocodeAddress(street, cityName);
+        if (cancelled) return;
+        if (result) {
+          setPosition([result.lat, result.lng]);
+          setGeoStatus('found');
+        } else {
+          setGeoStatus('notfound');
+        }
+      } catch (err) {
+        if (cancelled || err.name === 'AbortError') return;
+        setGeoStatus('error');
+      }
+    }, 800);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [address, cityName]);
+
+  // Annulla eventuali richieste in corso allo smontaggio
+  useEffect(() => () => cancelGeocoding(), []);
 
   const validate = () => {
     const err = {};
@@ -157,8 +243,14 @@ const AddService = () => {
     if (!form.address.trim()) err.address = t('app.addService.errRequired');
     if (!form.description.trim()) err.description = t('app.addService.errRequired');
     else if (form.description.trim().length < 20) err.description = t('app.addService.errDescShort');
-    if (form.website && !/^https?:\/\/.+/i.test(form.website)) err.website = t('app.addService.errUrl');
+    // Exige un domaine complet (miosito.it), avec ou sans http(s)://
+    if (form.website && !/^(https?:\/\/)?[\w-]+(\.[\w-]+)+([/?#].*)?$/i.test(form.website.trim())) {
+      err.website = t('app.addService.errUrl');
+    }
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) err.email = t('app.addService.errEmail');
+    // Numeri: libphonenumber-js verifica che il numero esista davvero nel paese
+    if (form.phone && !phoneValidity.phone) err.phone = t('app.addService.errPhone');
+    if (form.whatsapp && !phoneValidity.whatsapp) err.whatsapp = t('app.addService.errPhone');
     setErrors(err);
     return Object.keys(err).length === 0;
   };
@@ -196,6 +288,13 @@ const AddService = () => {
       setTimeout(() => navigate('/dashboard'), 1600);
     } catch (err) {
       setServerError(err.message);
+      // Le serveur indique quels champs sont en cause : on les met en évidence
+      if (err.fieldErrors && Object.keys(err.fieldErrors).length > 0) {
+        setErrors(prev => ({ ...prev, ...err.fieldErrors }));
+        // Remonte au premier champ en erreur pour que l'utilisateur le voie
+        const first = Object.keys(err.fieldErrors)[0];
+        document.getElementById(first)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     } finally {
       setSubmitting(false);
     }
@@ -250,19 +349,29 @@ const AddService = () => {
                   onChange={handleChange} disabled={loadingMeta}
                   className={errors.categoryId ? 'as-input as-input--err' : 'as-input'}>
                   <option value="">{loadingMeta ? t('app.addService.loading') : t('app.addService.selectCategory')}</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  {categories.map(c => <option key={c.id} value={c.id}>{getCategoryLabel(c, language)}</option>)}
                 </select>
                 {errors.categoryId && <span className="as-err">{errors.categoryId}</span>}
               </div>
 
               <div className="as-field">
                 <label htmlFor="cityId">{t('app.addService.city')} *</label>
-                <select id="cityId" name="cityId" value={form.cityId}
-                  onChange={handleChange} disabled={loadingMeta}
-                  className={errors.cityId ? 'as-input as-input--err' : 'as-input'}>
-                  <option value="">{loadingMeta ? t('app.addService.loading') : t('app.addService.selectCity')}</option>
-                  {cities.map(c => <option key={c.id} value={c.id}>{c.name}{c.region ? ` (${c.region})` : ''}</option>)}
-                </select>
+                <CitySelect
+                  id="cityId"
+                  cities={cities}
+                  value={form.cityId}
+                  onChange={(cityId) => {
+                    setForm(prev => ({ ...prev, cityId }));
+                    if (errors.cityId) setErrors(prev => ({ ...prev, cityId: '' }));
+                    setServerError(null);
+                  }}
+                  loading={loadingMeta}
+                  error={!!errors.cityId}
+                  placeholder={t('app.addService.selectCity')}
+                  loadingLabel={t('app.addService.loading')}
+                  emptyLabel={t('app.addService.noCityFound')}
+                  clearLabel={t('app.activities.a11yClearSearch')}
+                />
                 {errors.cityId && <span className="as-err">{errors.cityId}</span>}
               </div>
             </div>
@@ -289,6 +398,29 @@ const AddService = () => {
           <section className="as-card">
             <h3 className="as-card__title">{t('app.addService.sectionLocation')}</h3>
             <p className="as-hint as-hint--block">{t('app.addService.mapHelp')}</p>
+            {/* Stato della ricerca automatica dell'indirizzo */}
+            {geoStatus !== 'idle' && (
+              <div className={`as-geo as-geo--${geoStatus}`} role="status" aria-live="polite">
+                {geoStatus === 'searching' && (
+                  <><span className="as-geo__spinner" aria-hidden="true" /> {t('app.addService.geoSearching')}</>
+                )}
+                {geoStatus === 'found' && (
+                  <><Icon name="check" size={15} /> {t('app.addService.geoFound')}</>
+                )}
+                {geoStatus === 'notfound' && (
+                  <><Icon name="alert" size={15} /> {t('app.addService.geoNotFound')}</>
+                )}
+                {geoStatus === 'error' && (
+                  <><Icon name="alert" size={15} /> {t('app.addService.geoError')}</>
+                )}
+              </div>
+            )}
+            {geoStatus === 'idle' && form.address.trim().length >= 3 && !selectedCity && (
+              <div className="as-geo as-geo--notfound" role="status">
+                <Icon name="alert" size={15} /> {t('app.addService.geoSelectCityFirst')}
+              </div>
+            )}
+
             <div className="as-map">
               <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
                 <TileLayer
@@ -296,7 +428,7 @@ const AddService = () => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <Recenter center={mapCenter} zoom={mapZoom} />
-                <LocationPicker position={position} onChange={setPosition} />
+                <LocationPicker position={position} onChange={handlePinChange} />
               </MapContainer>
             </div>
             <span className="as-hint">
@@ -319,8 +451,17 @@ const AddService = () => {
               </div>
               <div className="as-field">
                 <label htmlFor="phone">{t('app.addService.phone')}</label>
-                <input id="phone" name="phone" type="tel" value={form.phone}
-                  onChange={handleChange} className="as-input" placeholder="+39 …" />
+                <PhoneInput
+                  id="phone"
+                  locale={language}
+                  value={form.phone}
+                  error={!!errors.phone}
+                  onChange={(e164, meta) => handlePhoneChange('phone', e164, meta)}
+                  searchPlaceholder={t('app.addService.searchCountry')}
+                  emptyLabel={t('app.addService.noCountryFound')}
+                  countryLabel={t('app.addService.country')}
+                />
+                {errors.phone && <span className="as-err">{errors.phone}</span>}
               </div>
             </div>
             <div className="as-row">
@@ -333,8 +474,17 @@ const AddService = () => {
               </div>
               <div className="as-field">
                 <label htmlFor="whatsapp">{t('app.addService.whatsapp')}</label>
-                <input id="whatsapp" name="whatsapp" type="tel" value={form.whatsapp}
-                  onChange={handleChange} className="as-input" placeholder="+39 …" />
+                <PhoneInput
+                  id="whatsapp"
+                  locale={language}
+                  value={form.whatsapp}
+                  error={!!errors.whatsapp}
+                  onChange={(e164, meta) => handlePhoneChange('whatsapp', e164, meta)}
+                  searchPlaceholder={t('app.addService.searchCountry')}
+                  emptyLabel={t('app.addService.noCountryFound')}
+                  countryLabel={t('app.addService.country')}
+                />
+                {errors.whatsapp && <span className="as-err">{errors.whatsapp}</span>}
               </div>
             </div>
           </section>

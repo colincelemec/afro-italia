@@ -3,6 +3,7 @@
 // ============================================
 
 const { PrismaClient } = require('@prisma/client');
+const { devDetails } = require('../utils/errorResponse');
 const prisma = new PrismaClient();
 
 /**
@@ -91,7 +92,7 @@ exports.createReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la création de l\'avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -151,7 +152,7 @@ exports.getReviewsByBusiness = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -235,7 +236,7 @@ exports.updateReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour de l\'avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -303,7 +304,7 @@ exports.deleteReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression de l\'avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -370,7 +371,7 @@ exports.respondToReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de l\'ajout de la réponse',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -409,7 +410,7 @@ exports.reportReview = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors du signalement de l\'avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -468,7 +469,7 @@ exports.toggleVisibility = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour de la visibilité',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };

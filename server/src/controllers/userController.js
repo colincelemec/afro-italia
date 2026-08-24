@@ -3,6 +3,7 @@
 // ============================================
 
 const { PrismaClient } = require('@prisma/client');
+const { devDetails } = require('../utils/errorResponse');
 const prisma = new PrismaClient();
 
 /**
@@ -43,7 +44,7 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération du profil',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -90,7 +91,7 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la mise à jour du profil',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -133,7 +134,7 @@ exports.getFavorites = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des favoris',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -181,7 +182,7 @@ exports.getMyReviews = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la récupération des avis',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };
@@ -218,7 +219,7 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Erreur lors de la suppression du compte',
-      error: error.message,
+      ...devDetails(error),
     });
   }
 };

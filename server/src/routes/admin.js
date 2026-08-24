@@ -5,6 +5,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const claimController = require('../controllers/claimController');
 const { protect, restrictTo } = require('../middleware/auth');
 
 // Toutes les routes admin nécessitent d'être ADMIN
@@ -58,5 +59,17 @@ router.delete('/reviews/:id', adminController.deleteReview);
  * Supprimer un utilisateur
  */
 router.delete('/users/:id', adminController.deleteUser);
+
+/**
+ * GET /api/admin/claims
+ * Liste des revendications de fiches (query: status)
+ */
+router.get('/claims', claimController.getClaims);
+
+/**
+ * PATCH /api/admin/claims/:id
+ * Approuver ou refuser une revendication
+ */
+router.patch('/claims/:id', claimController.reviewClaim);
 
 module.exports = router;

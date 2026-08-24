@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "prisma migrate deploy && node src/server.js",
     "dev": "nodemon src/server.js",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
@@ -22,9 +22,14 @@
     "docker:seed": "docker-compose exec api npm run db:seed",
     "docker:studio": "docker-compose exec api npx prisma studio",
     "db:seed:censimento": "node prisma/seeds/businesses-reali.js",
-    "db:init": "prisma db push && node prisma/seed.js && node prisma/seeds/businesses-reali.js",
+    "db:init": "prisma db push && node prisma/seed.js && node prisma/seeds/cities-italia.js && node prisma/seeds/businesses-reali.js",
     "test": "jest --runInBand",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:seed:cities": "node prisma/seeds/cities-italia.js",
+    "db:migrate:init": "prisma migrate dev --name init",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:sql": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script",
+    "email:test": "node scripts/test-email.js"
   },
   "keywords": [
     "express",
@@ -46,15 +51,10 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "express-validator": "^7.0.1",
-    "google-auth-library": "^10.6.2",
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
-    "nodemailer": "^8.0.7",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-    "stripe": "^14.9.0"
+    "nodemailer": "^9.0.5"
   },
   "devDependencies": {
     "jest": "^30.4.2",

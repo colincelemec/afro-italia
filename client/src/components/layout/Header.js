@@ -63,15 +63,14 @@ const Header = () => {
           ) : (
             // App Mode - Full Navigation
             <>
-              <Link to="/dashboard" className="nav-link">{t('app.nav.dashboard')}</Link>
+              {isAuthenticated && (
+                <Link to="/dashboard" className="nav-link">{t('app.nav.dashboard')}</Link>
+              )}
               <Link to="/activities" className="nav-link">{t('app.nav.activities')}</Link>
 
               {isAuthenticated ? (
                 <>
                   <Link to="/profile" className="nav-link">{t('app.nav.profile')}</Link>
-                  {user?.role === 'business' && (
-                    <Link to="/business-dashboard" className="nav-link">My Business</Link>
-                  )}
                   {user?.role === 'ADMIN' && (
                     <Link to="/admin" className="nav-link">{t('app.nav.admin')}</Link>
                   )}
@@ -111,15 +110,14 @@ const Header = () => {
           ) : (
             // App Mode - Full Navigation
             <>
-              <Link to="/dashboard" className="nav-link" onClick={toggleMobileMenu}>{t('app.nav.dashboard')}</Link>
+              {isAuthenticated && (
+                <Link to="/dashboard" className="nav-link" onClick={toggleMobileMenu}>{t('app.nav.dashboard')}</Link>
+              )}
               <Link to="/activities" className="nav-link" onClick={toggleMobileMenu}>{t('app.nav.activities')}</Link>
 
               {isAuthenticated ? (
                 <>
                   <Link to="/profile" className="nav-link" onClick={toggleMobileMenu}>{t('app.nav.profile')}</Link>
-                  {user?.role === 'business' && (
-                    <Link to="/business-dashboard" className="nav-link" onClick={toggleMobileMenu}>My Business</Link>
-                  )}
                   {user?.role === 'ADMIN' && (
                     <Link to="/admin" className="nav-link" onClick={toggleMobileMenu}>{t('app.nav.admin')}</Link>
                   )}

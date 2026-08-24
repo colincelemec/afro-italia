@@ -38,6 +38,7 @@ model User {
   businesses    Business[]
   reviews       Review[]
   favorites     Favorite[]
+  claims        BusinessClaim[]
 
   @@map("users")
 }
@@ -163,12 +164,55 @@ model Business {
   category        Category          @relation(fields: [categoryId], references: [id])
   reviews         Review[]
   favorites       Favorite[]
+  claims          BusinessClaim[]
 
   @@index([cityId])
   @@index([categoryId])
   @@index([status])
   @@index([subscriptionTier])
   @@map("businesses")
+}
+
+// ============================================
+// REVENDICATION DE FICHE (« C'est mon activité »)
+// Les fiches issues du recensement appartiennent à un compte
+// placeholder : le vrai propriétaire demande à en prendre le contrôle.
+// ============================================
+
+enum ClaimStatus {
+  PENDING     // En attente de vérification par un admin
+  APPROVED    // Approuvée : la fiche a été transférée
+  REJECTED    // Refusée
+}
+
+model BusinessClaim {
+  id           String      @id @default(cuid())
+  businessId   String      @map("business_id")
+  userId       String      @map("user_id")      // Demandeur
+
+  // Informations fournies par le demandeur
+  fullName     String      @map("full_name")
+  role         String                            // Ex: propriétaire, gérant
+  phone        String
+  email        String
+  message      String?                           // Justification libre
+
+  status       ClaimStatus @default(PENDING)
+  adminNote    String?     @map("admin_note")    // Motif du refus, notes internes
+  reviewedAt   DateTime?   @map("reviewed_at")
+  reviewedById String?     @map("reviewed_by_id")
+
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+
+  business     Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Une seule demande en cours par utilisateur et par fiche
+  @@unique([businessId, userId])
+  @@index([status])
+  @@index([businessId])
+  @@map("business_claims")
 }
 
 // ============================================
@@ -224,22 +268,6 @@ model Favorite {
   @@map("favorites")
 }
 
-// ============================================
-// PAIEMENTS (Stripe)
-// ============================================
-
-model Payment {
-  id                String    @id @default(cuid())
-  userId            String    @map("user_id")
-  businessId        String?   @map("business_id")
-  stripePaymentId   String    @unique @map("stripe_payment_id")
-  amount            Int       // Montant en centimes
-  currency          String    @default("eur")
-  subscriptionTier  SubscriptionTier @map("subscription_tier")
-  status            String    // succeeded, pending, failed
-  createdAt         DateTime  @default(now()) @map("created_at")
-
-  @@index([userId])
-  @@index([businessId])
-  @@map("payments")
-}
+// NB : le modèle Payment (Stripe) a été retiré avec la fonctionnalité
+// d'abonnement. L'énumération SubscriptionTier est conservée : elle sert
+// encore au badge « Premium » et au tri des résultats.

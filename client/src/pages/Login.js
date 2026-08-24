@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import PasswordInput from '../components/common/PasswordInput';
 import useAuthStore from '../stores/authStore';
 import '../styles/Auth.css';
 
@@ -138,14 +139,16 @@ const Login = () => {
 
           <div className="form-group">
             <label htmlFor="password">{t('login.passwordLabel')}</label>
-            <input
-              type="password"
+            <PasswordInput
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               className={formErrors.password ? 'error' : ''}
               placeholder={t('login.passwordPlaceholder')}
+              autoComplete="current-password"
+              showLabel={getTranslation('common.showPassword', language)}
+              hideLabel={getTranslation('common.hidePassword', language)}
             />
             {formErrors.password && (
               <span className="field-error">{formErrors.password}</span>

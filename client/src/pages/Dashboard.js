@@ -8,6 +8,8 @@ import businessService from '../services/businessService';
 import useAuthStore from '../stores/authStore';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
+import usePageMeta from '../hooks/usePageMeta';
+import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import '../styles/Dashboard.css';
@@ -32,7 +34,7 @@ const Stars = ({ value }) => (
 );
 
 // ── Card attività compatta ──
-const BizCard = ({ business, onClick }) => (
+const BizCard = ({ business, onClick, language }) => (
   <article className="dh-bizcard" onClick={onClick} role="button" tabIndex={0}
     onKeyDown={e => e.key === 'Enter' && onClick()}>
     <div className="dh-bizcard__media">
@@ -43,7 +45,7 @@ const BizCard = ({ business, onClick }) => (
     <div className="dh-bizcard__body">
       <h4>{business.name}</h4>
       <p className="dh-bizcard__meta">
-        {business.category?.name} · {business.city?.name}
+        {getCategoryLabel(business.category, language)} · {business.city?.name}
       </p>
       <div className="dh-bizcard__rating">
         <Stars value={business.averageRating || 0} />
@@ -55,7 +57,7 @@ const BizCard = ({ business, onClick }) => (
 
 const EmptyState = ({ icon, text, actionLabel, onAction }) => (
   <div className="dh-empty">
-    <Icon name={icon} size={36} className="dh-empty__svg" />
+    <span className="dh-empty__badge"><Icon name={icon} size={30} className="dh-empty__svg" /></span>
     <p>{text}</p>
     {actionLabel && <button className="dh-btn dh-btn--ghost" onClick={onAction}>{actionLabel}</button>}
   </div>
@@ -66,6 +68,8 @@ const Dashboard = () => {
   const { user } = useAuthStore();
   const { language } = useLanguage();
   const t = (path) => getTranslation(path, language);
+
+  usePageMeta({ title: t('app.nav.dashboard'), noIndex: true });
 
   const [favorites, setFavorites] = useState([]);
   const [myReviews, setMyReviews] = useState([]);
@@ -186,7 +190,7 @@ const Dashboard = () => {
                   <Popup>
                     <div className="dh-popup">
                       <strong>{b.name}</strong>
-                      <p>{b.category?.name} · {b.city?.name}</p>
+                      <p>{getCategoryLabel(b.category, language)} · {b.city?.name}</p>
                       <Link to={`/businesses/${b.slug}`}>{t('app.dashboard.seeDetails')}</Link>
                     </div>
                   </Popup>
@@ -225,7 +229,7 @@ const Dashboard = () => {
               ) : (
                 <div className="dh-grid">
                   {favorites.map(b => (
-                    <BizCard key={b.id} business={b} onClick={() => navigate(`/businesses/${b.slug}`)} />
+                    <BizCard key={b.id} language={language} business={b} onClick={() => navigate(`/businesses/${b.slug}`)} />
                   ))}
                 </div>
               )
@@ -244,7 +248,7 @@ const Dashboard = () => {
                       </div>
                       <p className="dh-review__text">{r.comment}</p>
                       <span className="dh-review__meta">
-                        {r.business?.category?.name} · {r.business?.city?.name}
+                        {getCategoryLabel(r.business?.category, language)} · {r.business?.city?.name}
                       </span>
                     </li>
                   ))}
@@ -259,7 +263,7 @@ const Dashboard = () => {
                 <div className="dh-grid">
                   {myBusinesses.map(b => (
                     <div key={b.id} className="dh-myservice">
-                      <BizCard business={b} onClick={() => navigate(`/businesses/${b.slug}`)} />
+                      <BizCard language={language} business={b} onClick={() => navigate(`/businesses/${b.slug}`)} />
                       <div className="dh-myservice__actions">
                         <button
                           className="dh-btn dh-btn--ghost"

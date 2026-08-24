@@ -173,7 +173,16 @@ const businessService = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  /**
+   * Revendiquer une fiche (« C'est mon activité »)
+   * payload: { fullName, role, phone, email, message }
+   */
+  claimBusiness: (id, payload) => api.post(`/businesses/${id}/claim`, payload),
+
+  /** Statut de ma revendication sur cette fiche */
+  getMyClaim: (id) => api.get(`/businesses/${id}/claim/me`)
 };
 
 export default businessService;
