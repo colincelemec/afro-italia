@@ -651,3 +651,711 @@
   border-color: var(--color-primary);
   background: var(--color-primary-soft);
 }
+
+/* ============================================
+   ACCUEIL — recherche et activités visibles
+   dès l'entrée, sans compte
+   ============================================ */
+
+/* ── Barre de recherche du hero ── */
+.hero-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 620px;
+  margin: 32px auto 16px;
+  padding: 8px 8px 8px 16px;
+  background: var(--gh-bg-soft);
+  border: 1px solid var(--gh-border);
+  border-radius: 999px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hero-search:focus-within {
+  border-color: var(--gh-gold);
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.18), 0 8px 30px rgba(0, 0, 0, 0.28);
+}
+
+.hero-search__icon { color: var(--gh-muted); flex-shrink: 0; }
+
+.hero-search input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--gh-text);
+  font: inherit;
+  font-size: 1rem;
+  padding: 10px 0;
+}
+
+.hero-search input::placeholder { color: var(--gh-muted); }
+.hero-search input::-webkit-search-cancel-button { filter: grayscale(1); }
+
+.hero-search__btn {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 24px;
+  background: var(--gh-gold);
+  color: #1a1106;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.hero-search__btn:hover { background: #cf8a26; }
+
+.hero-browse {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gh-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.15s ease;
+}
+
+.hero-browse:hover { color: var(--gh-gold); }
+
+/* ── Catégories ── */
+.home-cats { padding: 56px 0 16px; }
+
+.home-cats__title {
+  font-family: var(--gh-font);
+  font-size: 1.15rem;
+  color: var(--gh-muted);
+  text-align: center;
+  font-weight: 600;
+  margin: 0 0 24px;
+}
+
+.home-cats__grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+
+.home-cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 12px;
+  background: var(--gh-bg-soft);
+  border: 1px solid var(--gh-border);
+  border-radius: 14px;
+  color: var(--gh-text);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: center;
+  transition: transform 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.home-cat svg { color: var(--gh-gold); }
+
+.home-cat:hover {
+  transform: translateY(-4px);
+  border-color: var(--gh-gold);
+  color: var(--gh-text-bright);
+}
+
+/* ── Activités en vedette ── */
+.home-featured { padding: 48px 0 72px; }
+
+.home-featured__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.home-featured__head h2 {
+  font-family: var(--gh-font);
+  font-size: 1.7rem;
+  color: var(--gh-text-bright);
+  margin: 0 0 6px;
+}
+
+.home-featured__head p { margin: 0; color: var(--gh-muted); font-size: 0.95rem; }
+
+.home-featured__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gh-gold);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.home-featured__all:hover { text-decoration: underline; }
+
+.home-featured__empty {
+  text-align: center;
+  color: var(--gh-muted);
+  padding: 40px 0;
+}
+
+.home-featured__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--gh-bg-soft);
+  border: 1px solid var(--gh-border);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(232, 163, 61, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.home-card__media {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(232, 163, 61, 0.08);
+  overflow: hidden;
+}
+
+.home-card__media img { width: 100%; height: 100%; object-fit: cover; }
+.home-card__fallback { color: var(--gh-gold); opacity: 0.55; }
+
+.home-card__body { padding: 16px 18px 18px; }
+
+.home-card__body h3 {
+  margin: 0 0 5px;
+  font-size: 1.02rem;
+  color: var(--gh-text-bright);
+}
+
+.home-card__meta {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  color: var(--gh-muted);
+}
+
+.home-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.86rem;
+  color: var(--gh-text);
+}
+
+.home-card__rating svg { color: var(--gh-gold); }
+.home-card__count { color: var(--gh-muted); }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .home-cats__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .hero-search {
+    flex-wrap: wrap;
+    border-radius: 16px;
+    padding: 10px;
+  }
+  .hero-search input { flex: 1 1 100%; padding: 6px 8px; }
+  .hero-search__btn { flex: 1 1 100%; }
+  .hero-search__icon { display: none; }
+
+  .home-cats { padding-top: 40px; }
+  .home-featured { padding-bottom: 48px; }
+  .home-featured__head h2 { font-size: 1.4rem; }
+}
+
+@media (max-width: 420px) {
+  .home-cats__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================
+   REFONTE CLAIRE ET CHALEUREUSE
+   Le thème clair est désormais le défaut : on remplace
+   l'esthétique « sombre et technique » (étoiles, grille,
+   faisceau, orbes contrastées) par une lumière douce et
+   des formes organiques. On privilégie l'air et l'ombre
+   portée plutôt que la bordure.
+   ============================================ */
+
+[data-theme='light'] .landing-page {
+  --gh-grad-start: #33261c;
+}
+
+/* ── Le hero respire, plus de grille technique ── */
+[data-theme='light'] .hero-section {
+  background:
+    radial-gradient(1100px 520px at 50% -10%, #fdf1e9 0%, transparent 70%),
+    radial-gradient(760px 420px at 88% 20%, rgba(224, 147, 47, 0.16) 0%, transparent 65%),
+    radial-gradient(680px 420px at 10% 75%, rgba(180, 85, 45, 0.10) 0%, transparent 65%),
+    var(--color-bg);
+  min-height: 82vh;                  /* moins haut : le contenu vient plus vite */
+  padding: 116px 24px 72px;
+}
+
+/* Effets sombres retirés sur le clair */
+[data-theme='light'] .gh-stars,
+[data-theme='light'] .gh-beam { display: none; }
+
+/* Orbes : très diffuses, elles deviennent une simple lumière colorée */
+[data-theme='light'] .gh-orb {
+  filter: blur(130px);
+  opacity: 0.30;
+}
+
+[data-theme='light'] .gh-orb--gold {
+  background: radial-gradient(circle, rgba(224, 147, 47, 0.5), transparent 70%);
+}
+[data-theme='light'] .gh-orb--brown {
+  background: radial-gradient(circle, rgba(180, 85, 45, 0.4), transparent 70%);
+}
+[data-theme='light'] .gh-orb--ember {
+  background: radial-gradient(circle, rgba(217, 126, 74, 0.35), transparent 70%);
+}
+[data-theme='light'] .gh-orb--cta {
+  background: radial-gradient(circle, rgba(224, 147, 47, 0.28), transparent 70%);
+}
+
+/* ── Titres : plus doux, moins « corporate tech » ── */
+[data-theme='light'] .hero-title {
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+[data-theme='light'] .hero-description {
+  color: #6f6055;
+  font-size: clamp(1.08rem, 2vw, 1.28rem);
+}
+
+/* ── Cartes : ombre douce, pas de bordure dure ── */
+[data-theme='light'] .gh-card,
+[data-theme='light'] .home-card,
+[data-theme='light'] .home-cat {
+  border-color: transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme='light'] .gh-card:hover,
+[data-theme='light'] .home-card:hover,
+[data-theme='light'] .home-cat:hover {
+  border-color: transparent;
+  box-shadow: var(--shadow);
+  transform: translateY(-5px);
+}
+
+/* ── Recherche : élément le plus visible de la page ── */
+[data-theme='light'] .hero-search {
+  background: #ffffff;
+  border-color: transparent;
+  box-shadow: var(--shadow);
+  border-radius: var(--radius-xl);
+  padding: 9px 9px 9px 20px;
+}
+
+[data-theme='light'] .hero-search:focus-within {
+  box-shadow: 0 0 0 4px var(--color-primary-soft), var(--shadow-lg);
+}
+
+[data-theme='light'] .hero-search__btn {
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 13px 26px;
+}
+
+[data-theme='light'] .hero-search__btn:hover { background: var(--color-primary-dark); }
+
+/* ── Alternance de fonds : sépare les sections sans traits ── */
+[data-theme='light'] .home-cats,
+[data-theme='light'] .features-section,
+[data-theme='light'] .testimonials-section {
+  background: var(--color-surface-alt);
+}
+
+[data-theme='light'] .home-featured,
+[data-theme='light'] .mission-section,
+[data-theme='light'] .benefits-section,
+[data-theme='light'] .how-it-works-section {
+  background: var(--color-bg);
+}
+
+/* ── Plus d'air entre les sections ── */
+[data-theme='light'] .mission-section,
+[data-theme='light'] .how-it-works-section,
+[data-theme='light'] .features-section,
+[data-theme='light'] .benefits-section,
+[data-theme='light'] .testimonials-section {
+  padding: var(--space-section) 0;
+}
+
+[data-theme='light'] .home-cats { padding: 72px 0 64px; }
+[data-theme='light'] .home-featured { padding: 72px 0 88px; }
+
+/* ── Boutons ── */
+[data-theme='light'] .landing-page .btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(180, 85, 45, 0.28);
+}
+
+[data-theme='light'] .landing-page .btn-primary:hover {
+  background: var(--color-primary-dark);
+  box-shadow: 0 10px 28px rgba(180, 85, 45, 0.36);
+}
+
+/* ── Icônes de catégorie : pastille douce ── */
+[data-theme='light'] .home-cat {
+  background: #ffffff;
+  padding: 26px 12px;
+}
+
+[data-theme='light'] .home-cat svg { color: var(--color-primary); }
+
+[data-theme='light'] .home-card__media {
+  background: linear-gradient(135deg, #fdf1e9, #f7f1ea);
+}
+
+[data-theme='light'] .home-card__fallback { color: var(--color-primary-light); }
+
+/* ── CTA final : bloc chaleureux plutôt que fond sombre ── */
+[data-theme='light'] .final-cta-section {
+  background:
+    radial-gradient(800px 400px at 50% 50%, #fdf1e9 0%, transparent 70%),
+    var(--color-bg);
+}
+
+/* ── Stats : carte flottante ── */
+[data-theme='light'] .stats-band__grid {
+  border-color: transparent;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 760px) {
+  [data-theme='light'] .hero-section { min-height: auto; padding: 96px 20px 56px; }
+  [data-theme='light'] .mission-section,
+  [data-theme='light'] .how-it-works-section,
+  [data-theme='light'] .features-section,
+  [data-theme='light'] .benefits-section,
+  [data-theme='light'] .testimonials-section { padding: var(--space-section-sm) 0; }
+}
+
+/* ============================================
+   HERO PHOTO PLEIN ÉCRAN
+   Une photo de la communauté occupe tout l'écran, un voile
+   sombre garantit la lisibilité, la typographie est massive.
+   L'humain d'abord, l'outil ensuite.
+
+   ► POUR METTRE VOTRE PHOTO :
+     déposez-la dans client/public/ (ex. hero.jpg) puis
+     remplacez la valeur de --hero-image ci-dessous par :
+     url('/hero.jpg')
+     Sans photo, le dégradé chaleureux s'affiche.
+   ============================================ */
+
+.hero-section--photo {
+  --hero-image: none;              /* ← votre photo ici */
+  --hero-scrim: 0.58;              /* opacité du voile sombre */
+
+  position: relative;
+  /* Le hero passe au-dessus des sections suivantes : sans cela, la bande
+     de statistiques (z-index: 2) recouvrait la liste de suggestions. */
+  z-index: 20;
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 140px 0 96px;
+  /* Surtout PAS overflow:hidden : la liste de suggestions dépasse
+     du hero et serait rognée. Le média est déjà borné par inset:0. */
+  overflow: visible;
+  background: none;                /* neutralise la grille technique */
+}
+
+/* Image (ou dégradé de repli) */
+.hero-section--photo .hero-media {
+  position: absolute;
+  inset: 0;
+  background-image: var(--hero-image),
+    linear-gradient(135deg, #6b2f16 0%, #b4552d 45%, #e0932f 100%);
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  /* Pas d'agrandissement : il débordait du cadre et obligeait à
+     rogner le hero, ce qui coupait la liste de suggestions. */
+}
+
+/* Voile : sombre à gauche pour le texte, transparent à droite */
+.hero-section--photo .hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg,
+      rgba(20, 12, 6, 0.88) 0%,
+      rgba(20, 12, 6, 0.72) 38%,
+      rgba(20, 12, 6, 0.35) 68%,
+      rgba(20, 12, 6, 0.20) 100%),
+    linear-gradient(180deg, rgba(20, 12, 6, 0.55) 0%, transparent 22%);
+  opacity: var(--hero-scrim);
+}
+
+.hero-section--photo .hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  text-align: left;
+}
+
+/* Surtitre discret */
+.hero-eyebrow {
+  display: inline-block;
+  padding: 7px 16px;
+  margin-bottom: 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Titre massif, comme sur la référence */
+.hero-section--photo .hero-title {
+  font-size: clamp(2.7rem, 6.4vw, 5.2rem);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  color: #fff;
+  max-width: 15ch;
+  margin: 0 0 22px;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.35);
+}
+
+.hero-section--photo .hero-description {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(1.05rem, 1.7vw, 1.28rem);
+  line-height: 1.62;
+  max-width: 52ch;
+  margin: 0 0 34px;
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Recherche : pilule blanche, l'élément le plus contrasté ── */
+.hero-section--photo .hero-search,
+[data-theme='light'] .hero-section--photo .hero-search {
+  margin: 0 0 18px;
+  max-width: 660px;
+  background: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 8px 8px 22px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+}
+
+.hero-section--photo .hero-search input { color: #33261c; }
+
+.hero-section--photo .hero-search__btn,
+[data-theme='light'] .hero-section--photo .hero-search__btn {
+  border-radius: 999px;
+  padding: 14px 30px;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* ── Lien secondaire, en pilule claire ── */
+.hero-section--photo .hero-browse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #33261c;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.hero-section--photo .hero-browse:hover {
+  background: #fff;
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+/* Indicateur de défilement en blanc sur la photo */
+.hero-section--photo .hero-scroll-indicator { color: rgba(255, 255, 255, 0.7); }
+
+/* Le voile suffit : pas d'orbes ni d'étoiles sur la photo */
+.hero-section--photo .gh-orb,
+.hero-section--photo .gh-stars { display: none; }
+
+/* ── Mobile : le texte se recentre, le voile s'uniformise ── */
+@media (max-width: 760px) {
+  .hero-section--photo {
+    min-height: 78vh;
+    padding: 116px 0 72px;
+    text-align: center;
+  }
+  .hero-section--photo .hero-content { text-align: center; }
+  .hero-section--photo .hero-title { max-width: 100%; }
+  .hero-section--photo .hero-description { margin-left: auto; margin-right: auto; }
+  .hero-section--photo .hero-scrim {
+    background: linear-gradient(180deg,
+      rgba(20, 12, 6, 0.75) 0%,
+      rgba(20, 12, 6, 0.85) 100%);
+  }
+  .hero-section--photo .hero-search { margin-left: auto; margin-right: auto; }
+}
+
+/* ============================================
+   SUGGESTIONS DE RECHERCHE (accueil)
+   Les activités correspondantes apparaissent dès la
+   deuxième lettre, sous la barre de recherche.
+   ============================================ */
+
+.hero-search-wrap {
+  position: relative;
+  max-width: 660px;
+  margin: 0 0 18px;
+  z-index: 50;
+}
+
+/* La barre reprend sa place dans le conteneur */
+.hero-section--photo .hero-search-wrap .hero-search { margin: 0; }
+
+.hero-suggest {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  z-index: 60;
+  /* Si la liste est plus longue que l'écran, elle défile
+     au lieu de s'étendre indéfiniment. */
+  max-height: min(60vh, 440px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  text-align: left;
+  animation: hero-suggest-in 0.16s ease;
+}
+
+@keyframes hero-suggest-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-suggest__msg {
+  padding: 20px 22px;
+  color: #786858;
+  font-size: 0.92rem;
+}
+
+.hero-suggest__item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 20px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f2ebe2;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: background 0.14s ease;
+}
+
+.hero-suggest__item:last-of-type { border-bottom: none; }
+
+.hero-suggest__item.is-active { background: #fdf1e9; }
+
+.hero-suggest__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #fdf1e9;
+  color: #b4552d;
+}
+
+.hero-suggest__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hero-suggest__text strong {
+  color: #33261c;
+  font-size: 0.96rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hero-suggest__text small {
+  color: #786858;
+  font-size: 0.82rem;
+}
+
+.hero-suggest__go { color: #b4552d; flex-shrink: 0; opacity: 0; transition: opacity 0.14s ease; }
+.hero-suggest__item.is-active .hero-suggest__go { opacity: 1; }
+
+/* Dernière ligne : basculer vers la page de résultats complète */
+.hero-suggest__all {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  background: #f7f1ea;
+  border: none;
+  border-top: 1px solid #ece2d6;
+  color: #b4552d;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.hero-suggest__all:hover { background: #fdf1e9; }
+
+@media (max-width: 760px) {
+  .hero-search-wrap { margin-left: auto; margin-right: auto; }
+  .hero-suggest { text-align: left; }
+}

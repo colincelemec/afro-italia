@@ -1,18 +1,26 @@
 // ============================================
-// Protected Route Component
-// Redirects to login if user is not authenticated
+// ProtectedRoute — réservé aux utilisateurs connectés
+//
+// On mémorise la page demandée : après connexion, l'utilisateur y
+// est renvoyé automatiquement au lieu d'atterrir sur la dashboard.
 // ============================================
 
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
+  const location = useLocation();
 
   if (!isAuthenticated) {
-    // Redirect to login page if not authenticated
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location.pathname + location.search }}
+      />
+    );
   }
 
   return children;

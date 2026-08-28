@@ -6,12 +6,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const STORAGE_KEY = 'afroitalia-theme';
-const ThemeContext = createContext({ theme: 'dark', toggleTheme: () => {} });
+// Le thème clair est le défaut : il porte l'identité chaleureuse
+// d'AfroItalia. Le sombre reste disponible pour ceux qui le préfèrent.
+const ThemeContext = createContext({ theme: 'light', toggleTheme: () => {} });
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved === 'light' || saved === 'dark' ? saved : 'dark';
+    return saved === 'light' || saved === 'dark' ? saved : 'light';
   });
 
   useEffect(() => {

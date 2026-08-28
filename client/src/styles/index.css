@@ -34,10 +34,20 @@
   --font-display: 'Mona Sans Variable', 'Mona Sans', 'Poppins', -apple-system,
     BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Forme */
-  --radius: 12px;
-  --radius-lg: 14px;
+  /* Formes — arrondis généreux : l'interface paraît plus douce,
+     plus accueillante, moins « logicielle ». */
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 56px rgba(0, 0, 0, 0.55);
+
+  /* Rythme vertical : une seule échelle, pour un espacement cohérent */
+  --space-section: 96px;
+  --space-section-sm: 64px;
 
   /* Skeleton / shimmer (caricamento) */
   --skeleton-base: #161b22;
@@ -51,33 +61,44 @@
    Palette calda crema/marrone, stessa identità
    ============================================ */
 [data-theme='light'] {
-  --color-primary: #8b4513;        /* marrone: azioni, link */
-  --color-primary-dark: #654321;
-  --color-primary-light: #a0622d;
-  --color-primary-soft: #f7efe6;
+  /* Terracotta : plus chaleureuse et plus lisible que le marron foncé,
+     elle évoque la terre africaine sans assombrir l'interface. */
+  --color-primary: #b4552d;
+  --color-primary-dark: #8f3f1e;
+  --color-primary-light: #d17a4e;
+  --color-primary-soft: #fdf1e9;   /* fonds de badges, états actifs */
   --color-on-primary: #ffffff;
-  --color-accent: #e8a33d;         /* oro: stelle, highlight */
+  --color-accent: #e0932f;         /* ambre : étoiles, points forts */
   --color-ember: #d97e4a;
   --color-brown: #8b4513;
 
-  --color-bg: #faf8f5;
+  /* Fonds : crème très clair, jamais blanc pur — plus doux pour l'œil */
+  --color-bg: #fdfaf6;
   --color-surface: #ffffff;
-  --color-border: #e8e0d6;
+  --color-surface-alt: #f7f1ea;    /* alternance de sections */
+  --color-border: #ece2d6;
 
-  --color-text: #2d2118;
-  --color-text-bright: #1a1106;
-  --color-muted: #7a6a5c;
+  --color-text: #33261c;
+  --color-text-bright: #1d130b;
+  /* Assombri : #857567 tombait à 4,26:1, sous le seuil WCAG AA de 4,5 */
+  --color-muted: #786858;
 
   --color-success: #2e7d32;
-  --color-success-soft: #e8f3e9;
-  --color-error: #c62828;
-  --color-error-soft: #fbe9e7;
+  --color-success-soft: #e9f4ea;
+  --color-error: #c0392b;
+  --color-error-soft: #fceae7;
 
-  --shadow: 0 8px 24px rgba(45, 33, 24, 0.08);
+  /* Ombres douces et diffuses : c'est elles qui donnent l'air,
+     bien plus que les bordures. */
+  --shadow-sm: 0 1px 2px rgba(51, 38, 28, 0.04),
+               0 2px 8px rgba(51, 38, 28, 0.04);
+  --shadow: 0 2px 4px rgba(51, 38, 28, 0.04),
+            0 12px 32px rgba(51, 38, 28, 0.07);
+  --shadow-lg: 0 4px 8px rgba(51, 38, 28, 0.05),
+               0 24px 56px rgba(51, 38, 28, 0.10);
 
-  /* Skeleton / shimmer sul chiaro */
-  --skeleton-base: #ece6de;
-  --skeleton-shine: #f6f2ec;
+  --skeleton-base: #efe7dd;
+  --skeleton-shine: #f8f3ec;
 
   color-scheme: light;
 }
@@ -107,4 +128,75 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* ============================================
+   THÈME CLAIR — douceur globale
+   Sur fond clair, l'ombre portée sépare mieux les éléments
+   que la bordure : plus aéré, moins « grillagé ».
+   ============================================ */
+[data-theme='light'] {
+  /* Cartes et surfaces : ombre douce, bordure quasi invisible */
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow);
+}
+
+/* Cartes d'activités, panneaux, encadrés : coins plus ronds */
+[data-theme='light'] .act-card,
+[data-theme='light'] .act-slide,
+[data-theme='light'] .dh-bizcard,
+[data-theme='light'] .dh-stat,
+[data-theme='light'] .ad-card,
+[data-theme='light'] .ad-claim,
+[data-theme='light'] .bd-sidebar-card,
+[data-theme='light'] .bd-review-card,
+[data-theme='light'] .sub-plan {
+  border-color: transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.22s ease, transform 0.22s ease;
+}
+
+[data-theme='light'] .act-card:hover,
+[data-theme='light'] .act-slide:hover,
+[data-theme='light'] .dh-bizcard:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-4px);
+}
+
+/* Champs de saisie : plus hauts et plus ronds, ils respirent */
+[data-theme='light'] input:not([type='checkbox']):not([type='radio']),
+[data-theme='light'] select,
+[data-theme='light'] textarea {
+  border-radius: var(--radius);
+}
+
+/* Barres d'en-tête de page : dégradé chaleureux au lieu d'un aplat */
+[data-theme='light'] .act-hero,
+[data-theme='light'] .dh-hero,
+[data-theme='light'] .ad-hero {
+  background:
+    radial-gradient(900px 400px at 50% -20%, #fdf1e9 0%, transparent 70%),
+    var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Boutons principaux : ombre colorée douce */
+[data-theme='light'] .act-btn,
+[data-theme='light'] .dh-btn--primary,
+[data-theme='light'] .as-btn--primary,
+[data-theme='light'] .claim__btn--primary,
+[data-theme='light'] .nf-btn--primary {
+  box-shadow: 0 4px 14px rgba(180, 85, 45, 0.22);
+}
+
+/* La modale et les popups flottent au lieu d'être encadrés */
+[data-theme='light'] .cdialog,
+[data-theme='light'] .claim,
+[data-theme='light'] .cb-panel,
+[data-theme='light'] .cs-list,
+[data-theme='light'] .pi-dropdown,
+[data-theme='light'] .toast {
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
 }

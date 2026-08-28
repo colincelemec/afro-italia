@@ -3,17 +3,126 @@
 // adattato all'identità AfroItalia (marrone/ambra)
 // ============================================
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Icon from '../components/common/Icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import { getCategoryLabel } from '../utils/categoryLabel';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
 import usePageMeta from '../hooks/usePageMeta';
 import '../styles/LandingPage.css';
 
+// Raccourcis de catégories affichés sur l'accueil
+const CATEGORY_SHORTCUTS = [
+  { slug: 'restaurant', icon: 'ristorante' },
+  { slug: 'coiffeur',   icon: 'bellezza' },
+  { slug: 'epicerie',   icon: 'negozio' },
+  { slug: 'mode',       icon: 'moda' },
+  { slug: 'beaute',     icon: 'cosmetici' },
+  { slug: 'service',    icon: 'servizi' },
+];
+
 const LandingPage = () => {
   const { language } = useLanguage();
+  const navigate = useNavigate();
   const t = (path) => getTranslation(path, language);
+
+  // ── Aperçu de l'annuaire, directement sur l'accueil ──
+  // Le visiteur voit de vraies activités sans compte ni clic supplémentaire.
+  const [featured, setFeatured] = useState([]);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const res = await api.get('/businesses', { limit: 6 });
+        if (active) setFeatured(res.data || []);
+      } catch {
+        if (active) setFeatured([]);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
+
+  // ── Suggestions pendant la frappe ──
+  // Le visiteur voit apparaître les activités correspondantes dès les
+  // premières lettres, et peut aller directement sur une fiche.
+  const [suggestions, setSuggestions] = useState([]);
+  const [searching, setSearching] = useState(false);
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [activeSuggest, setActiveSuggest] = useState(-1);
+  const searchRef = useRef(null);
+
+  // Recherche différée : on n'interroge pas le serveur à chaque touche
+  useEffect(() => {
+    const q = query.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      setSearching(false);
+      return;
+    }
+
+    let active = true;
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await api.get('/businesses/search', { q });
+        if (active) setSuggestions((res.data || []).slice(0, 6));
+      } catch {
+        if (active) setSuggestions([]);
+      } finally {
+        if (active) setSearching(false);
+      }
+    }, 250);
+
+    return () => { active = false; clearTimeout(timer); };
+  }, [query]);
+
+  // Fermeture au clic à l'extérieur
+  useEffect(() => {
+    if (!showSuggest) return;
+    const onClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSuggest(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [showSuggest]);
+
+  const openBusiness = (b) => {
+    setShowSuggest(false);
+    navigate(`/businesses/${b.slug}`);
+  };
+
+  const submitSearch = (e) => {
+    e.preventDefault();
+    // Une suggestion est surlignée au clavier : on ouvre sa fiche
+    if (activeSuggest >= 0 && suggestions[activeSuggest]) {
+      openBusiness(suggestions[activeSuggest]);
+      return;
+    }
+    const q = query.trim();
+    setShowSuggest(false);
+    navigate(q ? `/activities?q=${encodeURIComponent(q)}` : '/activities');
+  };
+
+  // Navigation au clavier dans la liste
+  const onSearchKeyDown = (e) => {
+    if (!showSuggest || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggest(i => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggest(i => Math.max(i - 1, -1));
+    } else if (e.key === 'Escape') {
+      setShowSuggest(false);
+      setActiveSuggest(-1);
+    }
+  };
 
   usePageMeta({
     title: t('landing.hero.title'),
@@ -41,28 +150,94 @@ const LandingPage = () => {
   return (
     <div className="landing-page">
 
-      {/* ════════ HERO ════════ */}
-      <section className="hero-section">
-        {/* Effetti: orbe luminose + griglia + stelle */}
-        <div className="gh-stars" aria-hidden="true"></div>
-        <div className="gh-orb gh-orb--gold" aria-hidden="true"></div>
-        <div className="gh-orb gh-orb--brown" aria-hidden="true"></div>
-        <div className="gh-orb gh-orb--ember" aria-hidden="true"></div>
+      {/* ════════ HERO — photo plein écran ════════ */}
+      {/* La photo se règle dans LandingPage.css (--hero-image).
+          Sans photo, un dégradé chaleureux prend le relais. */}
+      <section className="hero-section hero-section--photo">
+        <div className="hero-media" aria-hidden="true" />
+        <div className="hero-scrim" aria-hidden="true" />
 
         <div className="hero-content">
+          <span className="hero-eyebrow">{t('landing.hero.eyebrow')}</span>
           <h1 className="hero-title">
-            <span className="gh-gradient-text">{t('landing.hero.title')}</span>
+            {t('landing.hero.title')}
           </h1>
           <p className="hero-description">{t('landing.hero.description')}</p>
-          <div className="hero-cta">
-            <Link to="/register" className="btn btn-primary">
-              {t('landing.hero.ctaGetStarted')}
-              <Icon name="arrowR" size={16} />
-            </Link>
-            <Link to="/login" className="btn btn-secondary">
-              {t('landing.hero.ctaSignIn')}
-            </Link>
+
+          {/* Recherche : l'action principale de l'accueil, sans compte */}
+          <div className="hero-search-wrap" ref={searchRef}>
+            <form className="hero-search" onSubmit={submitSearch} role="search">
+              <Icon name="search" size={20} className="hero-search__icon" />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowSuggest(true);
+                  setActiveSuggest(-1);
+                }}
+                onFocus={() => setShowSuggest(true)}
+                onKeyDown={onSearchKeyDown}
+                placeholder={t('landing.search.placeholder')}
+                aria-label={t('landing.search.placeholder')}
+                role="combobox"
+                aria-expanded={showSuggest && suggestions.length > 0}
+                aria-controls="hero-suggest-list"
+                aria-autocomplete="list"
+              />
+              <button type="submit" className="hero-search__btn">
+                {t('landing.search.button')}
+              </button>
+            </form>
+
+            {/* Propositions d'activités pendant la frappe */}
+            {showSuggest && query.trim().length >= 2 && (
+              <div className="hero-suggest" id="hero-suggest-list" role="listbox">
+                {searching && suggestions.length === 0 ? (
+                  <div className="hero-suggest__msg">{t('landing.search.searching')}</div>
+                ) : suggestions.length === 0 ? (
+                  <div className="hero-suggest__msg">{t('landing.search.noResult')}</div>
+                ) : (
+                  <>
+                    {suggestions.map((b, i) => (
+                      <button
+                        type="button"
+                        key={b.id}
+                        role="option"
+                        aria-selected={i === activeSuggest}
+                        className={`hero-suggest__item ${i === activeSuggest ? 'is-active' : ''}`}
+                        onMouseDown={(e) => { e.preventDefault(); openBusiness(b); }}
+                        onMouseEnter={() => setActiveSuggest(i)}
+                      >
+                        <span className="hero-suggest__icon">
+                          <Icon name="store" size={16} />
+                        </span>
+                        <span className="hero-suggest__text">
+                          <strong>{b.name}</strong>
+                          <small>
+                            {getCategoryLabel(b.category, language)}
+                            {b.city?.name ? ` · ${b.city.name}` : ''}
+                          </small>
+                        </span>
+                        <Icon name="arrowR" size={14} className="hero-suggest__go" />
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      className="hero-suggest__all"
+                      onMouseDown={(e) => { e.preventDefault(); submitSearch(e); }}
+                    >
+                      {t('landing.search.seeAllResults')} « {query.trim()} »
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
           </div>
+
+          <Link to="/activities" className="hero-browse">
+            {t('landing.search.browseAll')} <Icon name="arrowR" size={15} />
+          </Link>
         </div>
 
         <div className="hero-scroll-indicator" aria-hidden="true">
@@ -87,6 +262,66 @@ const LandingPage = () => {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ════════ CATÉGORIES — accès direct ════════ */}
+      <section className="home-cats">
+        <div className="container">
+          <h2 className="home-cats__title">{t('landing.browseCategories.title')}</h2>
+          <div className="home-cats__grid">
+            {CATEGORY_SHORTCUTS.map((c) => (
+              <Link key={c.slug} to={`/activities?category=${c.slug}`} className="home-cat">
+                <Icon name={c.icon} size={26} />
+                <span>{getCategoryLabel({ slug: c.slug }, language)}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════ ACTIVITÉS EN VEDETTE — visibles sans compte ════════ */}
+      <section className="home-featured">
+        <div className="container">
+          <div className="home-featured__head">
+            <div>
+              <h2>{t('landing.featured.title')}</h2>
+              <p>{t('landing.featured.subtitle')}</p>
+            </div>
+            <Link to="/activities" className="home-featured__all">
+              {t('landing.featured.seeAll')} <Icon name="arrowR" size={15} />
+            </Link>
+          </div>
+
+          {featured.length === 0 ? (
+            <p className="home-featured__empty">{t('landing.featured.empty')}</p>
+          ) : (
+            <div className="home-featured__grid">
+              {featured.map((b) => (
+                <Link key={b.id} to={`/businesses/${b.slug}`} className="home-card">
+                  <div className="home-card__media">
+                    {b.coverImage || b.logo ? (
+                      <img src={b.coverImage || b.logo} alt={b.name} loading="lazy" />
+                    ) : (
+                      <Icon name="store" size={38} className="home-card__fallback" />
+                    )}
+                  </div>
+                  <div className="home-card__body">
+                    <h3>{b.name}</h3>
+                    <p className="home-card__meta">
+                      {getCategoryLabel(b.category, language)}
+                      {b.city?.name ? ` · ${b.city.name}` : ''}
+                    </p>
+                    <div className="home-card__rating">
+                      <Icon name="star" size={13} />
+                      <span>{(b.averageRating || 0).toFixed(1)}</span>
+                      <span className="home-card__count">({b.reviewCount || 0})</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

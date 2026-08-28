@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -50,6 +50,7 @@ const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'satur
 const BusinessDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated } = useAuthStore();
   const toast = useToast();
   const { language } = useLanguage();
@@ -120,8 +121,15 @@ const BusinessDetail = () => {
     }
   }, [business, fetchReviews, loadMyClaim]);
 
+  // Le visiteur n'est jamais éjecté de la page : on l'invite à se connecter
+  // en conservant l'endroit où il se trouvait, pour y revenir ensuite.
+  const goToLogin = () => navigate('/login', { state: { from: location.pathname } });
+
   const handleFavorite = async () => {
-    if (!isAuthenticated) { navigate('/login'); return; }
+    if (!isAuthenticated) {
+      toast.info(t('signInToFavorite'));
+      return;
+    }
     const wasFavorite = isFavorite;
     try {
       await api.post(`/businesses/${business.id}/favorite`);
@@ -134,7 +142,7 @@ const BusinessDetail = () => {
 
   const handleSubmitReview = async (e) => {
     e.preventDefault();
-    if (!isAuthenticated) { navigate('/login'); return; }
+    if (!isAuthenticated) { setReviewError(t('signInToReview')); return; }
     if (!reviewComment.trim()) { setReviewError(t('reviewEmpty')); return; }
 
     setSubmittingReview(true);
@@ -186,7 +194,7 @@ const BusinessDetail = () => {
     return (
       <div className="bd-error">
         <p><Icon name="alert" size={18} /> {error || t('notFound')}</p>
-        <button onClick={() => navigate('/dashboard')} className="bd-back-btn">{t('backToDirectory')}</button>
+        <button onClick={() => navigate('/activities')} className="bd-back-btn">{t('backToDirectory')}</button>
       </div>
     );
   }
@@ -199,7 +207,7 @@ const BusinessDetail = () => {
     <div className="bd-page">
       {/* Back nav */}
       <div className="bd-nav">
-        <button onClick={() => navigate('/dashboard')} className="bd-back-link">
+        <button onClick={() => navigate('/activities')} className="bd-back-link">
           {t('directory')}
         </button>
         <span className="bd-breadcrumb">{getCategoryLabel(business.category, language)} / {business.city?.name}</span>
@@ -333,7 +341,7 @@ const BusinessDetail = () => {
                         </div>
                         <button
                           className="bd-claim__btn"
-                          onClick={() => isAuthenticated ? setClaimOpen(true) : navigate('/login')}
+                          onClick={() => isAuthenticated ? setClaimOpen(true) : goToLogin()}
                         >
                           {isAuthenticated ? t('claimButton') : t('claimLoginFirst')}
                         </button>
@@ -472,7 +480,7 @@ const BusinessDetail = () => {
             {!isAuthenticated && (
               <div className="bd-login-prompt">
                 <p>
-                  <button className="bd-login-link" onClick={() => navigate('/login')}>{t('login')}</button>
+                  <button className="bd-login-link" onClick={goToLogin}>{t('login')}</button>
                   {' '}{t('loginToReview')}
                 </p>
               </div>

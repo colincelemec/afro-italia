@@ -285,3 +285,71 @@
 
 [data-theme='light'] .header-dark .mobile-nav { background: var(--color-bg); }
 [data-theme='light'] .header-dark .mobile-nav .nav-link { color: var(--color-text); }
+
+/* ============================================
+   EN-TÊTE TRANSPARENT SUR LE HERO PHOTO
+   Le menu flotte au-dessus de l'image : on gagne
+   toute la hauteur d'écran pour la photo.
+   ============================================ */
+.header-over-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+/* Textes en blanc, lisibles sur la photo */
+.header-over-hero .nav-link,
+.header-over-hero .header-logo h1,
+.header-over-hero .mobile-menu-toggle {
+  color: #fff;
+}
+
+.header-over-hero .nav-link:hover { color: rgba(255, 255, 255, 0.75); }
+
+/* Bouton d'inscription : pilule blanche, très visible */
+.header-over-hero .register-button {
+  background: #fff;
+  color: #33261c;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-weight: 700;
+  border: none;
+}
+
+.header-over-hero .register-button:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Connexion : pilule translucide */
+.header-over-hero .login-button {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  border-radius: 999px;
+  padding: 10px 22px;
+  backdrop-filter: blur(8px);
+}
+
+.header-over-hero .login-button:hover { background: rgba(255, 255, 255, 0.24); }
+
+/* Sélecteurs de langue et de thème en blanc */
+.header-over-hero .lang-selector button,
+.header-over-hero .theme-toggle {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* Menu mobile déployé : fond opaque pour rester lisible */
+.header-over-hero .mobile-nav {
+  background: rgba(20, 12, 6, 0.96);
+  backdrop-filter: blur(12px);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.header-over-hero .mobile-nav .nav-link { color: #fff; }

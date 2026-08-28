@@ -41,8 +41,11 @@ const Header = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
+  // `header-over-hero` = en-tête transparent posé sur la photo :
+  // uniquement sur l'accueil. Ailleurs (connexion, inscription…),
+  // le fond est clair et le texte doit rester foncé.
   return (
-    <header className={`header ${isLandingPage ? 'header-landing' : 'header-app'} ${isHome ? 'header-dark' : ''}`}>
+    <header className={`header ${isLandingPage ? 'header-landing' : 'header-app'} ${isHome ? 'header-over-hero header-dark' : ''}`}>
       <div className="header-container">
         <div className="header-logo">
           <Link to={isAuthenticated ? "/dashboard" : "/"}>

@@ -5,7 +5,7 @@
 // ============================================
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -86,14 +86,24 @@ const Activities = () => {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({ totalPages: 1, total: 0 });
 
-  const [category, setCategory] = useState('all');
+  // Filtres initialisés depuis l'URL : une recherche lancée depuis
+  // l'accueil (/activities?q=…) ou un raccourci de catégorie arrive ici.
+  const [searchParams] = useSearchParams();
+  const initialQ = searchParams.get('q') || '';
+  const initialCategory = searchParams.get('category') || 'all';
+  const initialCity = searchParams.get('city') || ALL_CITIES;
+
+  const [category, setCategory] = useState(initialCategory);
   // `city` contiene lo slug della città (es. 'reggio-calabria') o ALL_CITIES
-  const [city, setCity] = useState(ALL_CITIES);
+  const [city, setCity] = useState(initialCity);
   const [cities, setCities] = useState([]);
   const [sort, setSort] = useState('rating');
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState(initialQ);
+  const [search, setSearch] = useState(initialQ);
   const [view, setView] = useState('grid'); // 'grid' | 'map'
+  // Barre latérale : toujours visible sur grand écran,
+  // panneau coulissant sur mobile.
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // ── Ricerca server-side (insensibile alle maiuscole, su tutto il database) ──
   const [searchResults, setSearchResults] = useState([]);
@@ -405,57 +415,112 @@ const Activities = () => {
         </section>
       )}
 
-      {/* ════════ BARRA FILTRI (sticky) ════════ */}
-      <div className="act-filterbar">
-        <div className="act-container act-filterbar__inner">
-          <div className="act-pills" role="tablist" aria-label={t('app.activities.a11yCategories')}>
+      {/* ════════ MISE EN PAGE : BARRE LATÉRALE + RÉSULTATS ════════ */}
+      <div className="act-layout act-container">
+
+        {/* ── Bouton d'ouverture sur mobile ── */}
+        <button
+          className="act-sidebar-toggle"
+          onClick={() => setSidebarOpen(true)}
+          aria-expanded={sidebarOpen}
+        >
+          <Icon name="grid" size={16} />
+          {t('app.activities.filters')}
+          {hasActiveFilters && <span className="act-sidebar-toggle__dot" aria-hidden="true" />}
+        </button>
+
+        {/* Voile sombre derrière le panneau mobile */}
+        {sidebarOpen && (
+          <div className="act-sidebar-scrim" onClick={() => setSidebarOpen(false)} role="presentation" />
+        )}
+
+        {/* ── Barre latérale ── */}
+        <aside className={`act-sidebar ${sidebarOpen ? 'is-open' : ''}`}>
+          <div className="act-sidebar__head">
+            <h2>{t('app.activities.filters')}</h2>
+            <button
+              className="act-sidebar__close"
+              onClick={() => setSidebarOpen(false)}
+              aria-label={t('app.activities.closeFilters')}
+            >✕</button>
+          </div>
+
+          {/* Catégories */}
+          <nav className="act-catnav" aria-label={t('app.activities.a11yCategories')}>
+            <span className="act-sidebar__label">{t('app.activities.a11yCategories')}</span>
             {CATEGORIES.map(c => (
               <button
                 key={c.slug}
-                role="tab"
-                aria-selected={category === c.slug}
-                className={`act-pill ${category === c.slug ? 'act-pill--active' : ''}`}
-                onClick={() => setCategory(c.slug)}
+                aria-current={category === c.slug}
+                className={`act-catnav__item ${category === c.slug ? 'is-active' : ''}`}
+                onClick={() => { setCategory(c.slug); setSidebarOpen(false); }}
               >
-                <Icon name={c.icon} size={15} /> {t(c.labelKey)}
+                <span className="act-catnav__icon"><Icon name={c.icon} size={17} /></span>
+                <span className="act-catnav__label">{t(c.labelKey)}</span>
+                {category === c.slug && <Icon name="check" size={15} className="act-catnav__check" />}
               </button>
             ))}
+          </nav>
+
+          {/* Ville */}
+          <div className="act-sidebar__group">
+            <label className="act-sidebar__label" htmlFor="act-city">
+              {t('app.activities.a11yFilterCity')}
+            </label>
+            <select
+              id="act-city"
+              className="act-sidebar__select"
+              value={city}
+              onChange={e => setCity(e.target.value)}
+            >
+              <option value={ALL_CITIES}>{t('app.activities.allCities')}</option>
+              {cities.map(c => <option key={c.id} value={c.slug}>{c.name}</option>)}
+            </select>
           </div>
 
-          <div className="act-selects">
-            <select value={city} onChange={e => setCity(e.target.value)} aria-label={t('app.activities.a11yFilterCity')}>
-              <option value={ALL_CITIES}>{t('app.activities.allCities')}</option>
-              {cities.map(c => (
-                <option key={c.id} value={c.slug}>{c.name}</option>
-              ))}
-            </select>
-            <select value={sort} onChange={e => setSort(e.target.value)} aria-label={t('app.activities.a11ySortBy')}>
+          {/* Tri */}
+          <div className="act-sidebar__group">
+            <label className="act-sidebar__label" htmlFor="act-sort">
+              {t('app.activities.a11ySortBy')}
+            </label>
+            <select
+              id="act-sort"
+              className="act-sidebar__select"
+              value={sort}
+              onChange={e => setSort(e.target.value)}
+            >
               {SORTS.map(s => <option key={s.value} value={s.value}>{t(s.labelKey)}</option>)}
             </select>
-
-            {/* Toggle griglia / mappa */}
-            <div className="act-viewtoggle" role="group" aria-label={t('app.activities.a11yViewMode')}>
-              <button
-                className={view === 'grid' ? 'active' : ''}
-                onClick={() => setView('grid')}
-                aria-label={t('app.activities.a11yGridView')}
-              >
-                <Icon name="grid" size={15} /> {t('app.activities.viewGrid')}
-              </button>
-              <button
-                className={view === 'map' ? 'active' : ''}
-                onClick={() => setView('map')}
-                aria-label={t('app.activities.a11yMapView')}
-              >
-                <Icon name="map" size={15} /> {t('app.activities.viewMap')}
-              </button>
-            </div>
           </div>
-        </div>
-      </div>
+
+          {hasActiveFilters && (
+            <button className="act-sidebar__reset" onClick={resetFilters}>
+              {t('app.activities.removeFilters')}
+            </button>
+          )}
+        </aside>
 
       {/* ════════ RISULTATI ════════ */}
-      <main className="act-container act-results">
+        <main className="act-results">
+
+        <div className="act-results__bar">
+          <div className="act-viewtoggle" role="group" aria-label={t('app.activities.a11yViewMode')}>
+            <button
+              className={view === 'grid' ? 'active' : ''}
+              onClick={() => setView('grid')}
+              aria-label={t('app.activities.a11yGridView')}
+            >
+              <Icon name="grid" size={15} /> {t('app.activities.viewGrid')}
+            </button>
+            <button
+              className={view === 'map' ? 'active' : ''}
+              onClick={() => setView('map')}
+              aria-label={t('app.activities.a11yMapView')}
+            >
+              <Icon name="map" size={15} /> {t('app.activities.viewMap')}
+            </button>
+          </div>
+        </div>
 
         <div className="act-results__meta">
           {!loading && (
@@ -595,7 +660,8 @@ const Activities = () => {
             )}
           </>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

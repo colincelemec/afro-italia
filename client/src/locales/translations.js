@@ -14,6 +14,11 @@ export const translations = {
   // LANDING PAGE
   landing: {
     hero: {
+      eyebrow: {
+        en: "The African community in Italy",
+        fr: "La communauté africaine en Italie",
+        it: "La comunità africana in Italia"
+      },
       title: {
         en: "Discover and Support African Entrepreneurs in Italy",
         fr: "Découvrez et Soutenez les Entrepreneurs Africains en Italie",
@@ -35,6 +40,40 @@ export const translations = {
         it: "Accedi"
       }
     },
+    // ── Recherche et activités directement sur l'accueil ──
+    search: {
+      placeholder: {
+        en: "Search a restaurant, hairdresser, shop…",
+        fr: "Cherchez un restaurant, un coiffeur, une boutique…",
+        it: "Cerca un ristorante, un parrucchiere, un negozio…"
+      },
+      button: { en: "Search", fr: "Rechercher", it: "Cerca" },
+      browseAll: { en: "Browse all businesses", fr: "Voir toutes les activités", it: "Vedi tutte le attività" },
+      searching: { en: "Searching…", fr: "Recherche…", it: "Ricerca…" },
+      noResult: {
+        en: "No business matches your search",
+        fr: "Aucune activité ne correspond à votre recherche",
+        it: "Nessuna attività corrisponde alla tua ricerca"
+      },
+      seeAllResults: { en: "See all results for", fr: "Voir tous les résultats pour", it: "Vedi tutti i risultati per" }
+    },
+    featured: {
+      title: { en: "Discover these businesses", fr: "Découvrez ces activités", it: "Scopri queste attività" },
+      subtitle: {
+        en: "A glimpse of the community — no account needed",
+        fr: "Un aperçu de la communauté — aucun compte nécessaire",
+        it: "Uno sguardo sulla community — nessun account necessario"
+      },
+      seeAll: { en: "See all", fr: "Tout voir", it: "Vedi tutte" },
+      empty: {
+        en: "The directory is filling up. Come back soon!",
+        fr: "L'annuaire se remplit. Revenez bientôt !",
+        it: "La directory si sta riempiendo. Torna presto!"
+      }
+    },
+    browseCategories: {
+      title: { en: "Browse by category", fr: "Parcourir par catégorie", it: "Sfoglia per categoria" }
+    },
     stats: {
       cities: { en: "Cities covered", fr: "Villes couvertes", it: "Città coperte" },
       categories: { en: "Categories", fr: "Catégories", it: "Categorie" },
@@ -43,9 +82,9 @@ export const translations = {
     },
     mission: {
       title: {
-        en: "🎯 Our Mission",
-        fr: "🎯 Notre Mission",
-        it: "🎯 La Nostra Missione"
+        en: "Our Mission",
+        fr: "Notre Mission",
+        it: "La Nostra Missione"
       },
       card1: {
         title: {
@@ -86,9 +125,9 @@ export const translations = {
     },
     howItWorks: {
       title: {
-        en: "🔍 How It Works",
-        fr: "🔍 Comment Ça Marche",
-        it: "🔍 Come Funziona"
+        en: "How It Works",
+        fr: "Comment Ça Marche",
+        it: "Come Funziona"
       },
       step1: {
         title: {
@@ -129,9 +168,9 @@ export const translations = {
     },
     features: {
       title: {
-        en: "✨ Platform Features",
-        fr: "✨ Fonctionnalités de la Plateforme",
-        it: "✨ Funzionalità della Piattaforma"
+        en: "Platform Features",
+        fr: "Fonctionnalités de la Plateforme",
+        it: "Funzionalità della Piattaforma"
       },
       businessDirectory: {
         title: {
@@ -208,9 +247,9 @@ export const translations = {
     },
     benefits: {
       title: {
-        en: "💼 Benefits",
-        fr: "💼 Avantages",
-        it: "💼 Vantaggi"
+        en: "Benefits",
+        fr: "Avantages",
+        it: "Vantaggi"
       },
       forCustomers: {
         title: {
@@ -279,9 +318,9 @@ export const translations = {
     },
     testimonials: {
       title: {
-        en: "💬 What Our Community Says",
-        fr: "💬 Ce Que Dit Notre Communauté",
-        it: "💬 Cosa Dice la Nostra Comunità"
+        en: "What Our Community Says",
+        fr: "Ce Que Dit Notre Communauté",
+        it: "Cosa Dice la Nostra Comunità"
       },
       t1: {
         text: {
@@ -1077,7 +1116,7 @@ export const translations = {
       resultsIn: { en: "in", fr: "dans", it: "in" },
       resultsAt: { en: "in", fr: "à", it: "a" },
       onTheMap: { en: "on the map", fr: "sur la carte", it: "sulla mappa" },
-      removeFilters: { en: "✕ Clear filters", fr: "✕ Effacer les filtres", it: "✕ Rimuovi filtri" },
+      removeFilters: { en: "Clear filters", fr: "Effacer les filtres", it: "Rimuovi filtri" },
       retry: { en: "Retry", fr: "Réessayer", it: "Riprova" },
       loadError: {
         en: "Unable to load businesses.",
@@ -1098,6 +1137,8 @@ export const translations = {
       a11yClearSearch: { en: "Clear search", fr: "Effacer la recherche", it: "Cancella ricerca" },
       a11yScrollLeft: { en: "Scroll left", fr: "Défiler vers la gauche", it: "Scorri a sinistra" },
       a11yScrollRight: { en: "Scroll right", fr: "Défiler vers la droite", it: "Scorri a destra" },
+      filters: { en: "Filters", fr: "Filtres", it: "Filtri" },
+      closeFilters: { en: "Close filters", fr: "Fermer les filtres", it: "Chiudi i filtri" },
       a11yCategories: { en: "Categories", fr: "Catégories", it: "Categorie" },
       a11yFilterCity: { en: "Filter by city", fr: "Filtrer par ville", it: "Filtra per città" },
       a11ySortBy: { en: "Sort by", fr: "Trier par", it: "Ordina per" },
@@ -1244,7 +1285,22 @@ export const translations = {
         fr: "Connectez-vous pour revendiquer cette fiche",
         it: "Accedi per rivendicare questa attività"
       },
-      claimRequired: { en: "This field is required", fr: "Ce champ est requis", it: "Campo obbligatorio" }
+      claimRequired: { en: "This field is required", fr: "Ce champ est requis", it: "Campo obbligatorio" },
+
+      // ── Invitations à se connecter (sans quitter la page) ──
+      signInToFavorite: {
+        en: "Sign in to save this business to your favorites",
+        fr: "Connectez-vous pour ajouter cette activité à vos favoris",
+        it: "Accedi per salvare questa attività nei preferiti"
+      },
+      signInToReview: {
+        en: "Sign in to share your experience",
+        fr: "Connectez-vous pour partager votre expérience",
+        it: "Accedi per condividere la tua esperienza"
+      },
+      signInAction: { en: "Sign in", fr: "Se connecter", it: "Accedi" },
+      createAccount: { en: "Create an account", fr: "Créer un compte", it: "Crea un account" },
+      or: { en: "or", fr: "ou", it: "oppure" }
     },
 
     profile: {

@@ -3,7 +3,7 @@
 // ============================================
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useGoogleLogin } from '@react-oauth/google';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getTranslation } from '../locales/translations';
@@ -13,6 +13,10 @@ import '../styles/Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  // Page d'origine mémorisée par ProtectedRoute ou par une invitation
+  // à se connecter : on y retourne après authentification.
+  const redirectTo = location.state?.from || '/dashboard';
   const { language } = useLanguage();
   const { login, googleLogin, isLoading, error, clearError } = useAuthStore();
   const t = (path) => getTranslation(path, language);
@@ -64,7 +68,7 @@ const Login = () => {
 
     try {
       await login(formData);
-      navigate('/dashboard');
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       console.error('Login error:', err);
     }
@@ -75,7 +79,7 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       try {
         await googleLogin(tokenResponse.access_token);
-        navigate('/dashboard');
+        navigate(redirectTo, { replace: true });
       } catch (err) {
         console.error('Google login error:', err);
       }
