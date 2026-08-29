@@ -379,6 +379,38 @@ email.
 
 ---
 
+## 8b. Configure image uploads (Cloudinary)
+
+Business owners upload a logo and a cover photo from their device. The files
+go **straight from the browser to Cloudinary** — they never pass through your
+API, which keeps Railway's bandwidth and disk out of the picture.
+
+> This matters: Railway's filesystem is wiped on every deployment. Storing
+> uploads on the server would lose every photo each time you ship.
+
+1. Create a free account on **cloudinary.com** (25 monthly credits — far more
+   than a young directory needs)
+2. **Dashboard** → **Product Environment Credentials** → copy the three values
+3. Add them to your Railway variables:
+
+```
+CLOUDINARY_CLOUD_NAME = your cloud name
+CLOUDINARY_API_KEY    = your API key
+CLOUDINARY_API_SECRET = your API secret
+```
+
+**Without these variables nothing breaks**: the form falls back to asking for
+an image URL, and the API returns a clear "not configured" response.
+
+Images are automatically resized to 1600px max and quality-optimised on
+upload, so a 8 MB phone photo becomes a fast-loading web image.
+
+> ⚠️ `CLOUDINARY_API_SECRET` is a server-side secret. It signs upload requests
+> and must never appear in `REACT_APP_*` variables, which are embedded in the
+> JavaScript sent to browsers.
+
+---
+
 ## 9. Configure Google sign-in
 
 The current OAuth client only allows `localhost`. In production you must

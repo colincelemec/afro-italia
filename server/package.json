@@ -29,7 +29,8 @@
     "db:migrate:init": "prisma migrate dev --name init",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:sql": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script",
-    "email:test": "node scripts/test-email.js"
+    "email:test": "node scripts/test-email.js",
+    "db:publish-pending": "node scripts/publish-pending.js"
   },
   "keywords": [
     "express",

@@ -15,6 +15,7 @@ import { getTranslation } from '../locales/translations';
 import usePageMeta from '../hooks/usePageMeta';
 import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
+import SafeImage from '../components/common/SafeImage';
 import '../styles/Activities.css';
 
 // ── Fix icone Leaflet ──
@@ -387,11 +388,12 @@ const Activities = () => {
                   onKeyDown={e => e.key === 'Enter' && goTo(b.slug)}
                 >
                   <div className="act-slide__media">
-                    {b.coverImage || b.logo ? (
-                      <img src={b.coverImage || b.logo} alt={b.name} loading="lazy" />
-                    ) : (
-                      <Icon name={CATEGORIES.find(c => c.slug === b.category?.slug)?.icon || 'store'} size={42} className="act-slide__fallback" />
-                    )}
+                    <SafeImage
+                      src={b.coverImage || b.logo}
+                      alt={b.name}
+                      loading="lazy"
+                      fallback={<Icon name={CATEGORIES.find(c => c.slug === b.category?.slug)?.icon || 'store'} size={42} className="act-slide__fallback" />}
+                    />
                     {b.subscriptionTier === 'PREMIUM' && (
                       <span className="act-badge act-badge--premium">
                         <Icon name="star" size={11} /> {t('app.activities.premium')}
@@ -600,11 +602,12 @@ const Activities = () => {
                   onKeyDown={e => e.key === 'Enter' && goTo(b.slug)}
                 >
                   <div className="act-card__media">
-                    {b.coverImage || b.logo ? (
-                      <img src={b.coverImage || b.logo} alt={b.name} loading="lazy" />
-                    ) : (
-                      <Icon name={CATEGORIES.find(c => c.slug === b.category?.slug)?.icon || 'store'} size={46} className="act-card__fallback" />
-                    )}
+                    <SafeImage
+                      src={b.coverImage || b.logo}
+                      alt={b.name}
+                      loading="lazy"
+                      fallback={<Icon name={CATEGORIES.find(c => c.slug === b.category?.slug)?.icon || 'store'} size={46} className="act-card__fallback" />}
+                    />
                     {b.subscriptionTier === 'PREMIUM' && (
                       <span className="act-badge act-badge--premium">
                         <Icon name="star" size={11} /> {t('app.activities.premium')}

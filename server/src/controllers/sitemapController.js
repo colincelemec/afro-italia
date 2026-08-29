@@ -34,7 +34,9 @@ exports.getSitemap = async (req, res) => {
   try {
     const [businesses, cities] = await Promise.all([
       prisma.business.findMany({
-        where: { status: 'VERIFIED', isVerified: true },
+        // Toutes les fiches publiées, contrôlées ou non : elles sont
+        // publiques, donc elles doivent être indexables.
+        where: { status: 'VERIFIED' },
         select: { slug: true, updatedAt: true },
         orderBy: { updatedAt: 'desc' },
       }),

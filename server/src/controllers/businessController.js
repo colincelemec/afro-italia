@@ -25,10 +25,13 @@ exports.getAllBusinesses = async (req, res) => {
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Construire les filtres
+    // Deux notions distinctes, à ne pas confondre :
+    //   • `status`     → la fiche est-elle publiée ? (VERIFIED = oui)
+    //   • `isVerified` → l'équipe a-t-elle contrôlé la fiche ? (badge)
+    // On filtre donc sur la publication seule : une fiche visible mais
+    // pas encore contrôlée s'affiche, simplement sans badge.
     const where = {
-      status: status,
-      isVerified: true
+      status: status
     };
 
     if (city) {
@@ -99,9 +102,10 @@ exports.searchBusinesses = async (req, res) => {
   try {
     const { q, city, category, lat, lng, radius = 10 } = req.query;
 
+    // Comme ci-dessus : on cherche parmi les fiches publiées,
+    // qu'elles aient été contrôlées ou non.
     const where = {
-      status: 'VERIFIED',
-      isVerified: true
+      status: 'VERIFIED'
     };
 
     // Recherche par texte
@@ -278,7 +282,13 @@ exports.createBusiness = async (req, res) => {
         ...businessData,
         slug,
         ownerId: userId,
-        status: 'PENDING' // Doit être vérifié par un admin
+        // Publiée tout de suite : visible par tous, y compris les
+        // visiteurs sans compte. Un annuaire dont les fiches attendent
+        // une validation décourage ceux qui les déposent.
+        status: 'VERIFIED',
+        // Pas encore contrôlée par l'équipe : donc pas de badge.
+        // L'admin peut vérifier (badge), suspendre ou rejeter ensuite.
+        isVerified: false
       },
       include: {
         city: true,

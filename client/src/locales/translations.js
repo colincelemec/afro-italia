@@ -868,6 +868,7 @@ export const translations = {
       confirmCancel: { en: "Cancel", fr: "Annuler", it: "Annulla" },
 
       // ── Revendications de fiches ──
+      toCheck: { en: "To review", fr: "À contrôler", it: "Da controllare" },
       tabClaims: { en: "Claims", fr: "Revendications", it: "Richieste" },
       noClaims: { en: "No claims yet.", fr: "Aucune revendication.", it: "Nessuna richiesta." },
       claimRequester: { en: "Requester", fr: "Demandeur", it: "Richiedente" },
@@ -921,6 +922,45 @@ export const translations = {
       selectCity: { en: "Select a city", fr: "Choisir une ville", it: "Seleziona una città" },
       searchCity: { en: "Search a city…", fr: "Rechercher une ville…", it: "Cerca una città…" },
       country: { en: "Country", fr: "Pays", it: "Paese" },
+      imageHelp: {
+        en: "Paste the direct link to an image (ending in .jpg, .png or .webp). A link to a web page, a Google Drive file or a photo on your computer will not work — upload it to a free host such as imgbb.com or postimages.org first.",
+        fr: "Collez le lien direct vers une image (terminant par .jpg, .png ou .webp). Un lien vers une page web, un fichier Google Drive ou une photo de votre ordinateur ne fonctionnera pas — hébergez-la d'abord sur un service gratuit comme imgbb.com ou postimages.org.",
+        it: "Incolla il link diretto a un'immagine (che finisce con .jpg, .png o .webp). Un link a una pagina web, a un file Google Drive o a una foto sul tuo computer non funzionerà — caricala prima su un servizio gratuito come imgbb.com o postimages.org."
+      },
+      imageChoose: {
+        en: "Choose an image or drop it here",
+        fr: "Choisissez une image ou déposez-la ici",
+        it: "Scegli un'immagine o trascinala qui"
+      },
+      imageFormats: {
+        en: "JPG, PNG, WEBP or GIF · {max} MB max",
+        fr: "JPG, PNG, WEBP ou GIF · {max} Mo maximum",
+        it: "JPG, PNG, WEBP o GIF · massimo {max} MB"
+      },
+      imageUploading: { en: "Uploading…", fr: "Envoi en cours…", it: "Caricamento…" },
+      imageReplace: { en: "Replace", fr: "Remplacer", it: "Sostituisci" },
+      imageRemove: { en: "Remove", fr: "Retirer", it: "Rimuovi" },
+      imageTypeError: {
+        en: "Format not accepted (JPG, PNG, WEBP or GIF).",
+        fr: "Format non accepté (JPG, PNG, WEBP ou GIF).",
+        it: "Formato non accettato (JPG, PNG, WEBP o GIF)."
+      },
+      imageSizeError: {
+        en: "File too large (maximum {max} MB).",
+        fr: "Fichier trop lourd (maximum {max} Mo).",
+        it: "File troppo pesante (massimo {max} MB)."
+      },
+      imageUrlFallback: {
+        en: "File upload is not enabled on this server: paste the direct link to an image instead.",
+        fr: "L'envoi de fichiers n'est pas activé sur ce serveur : collez plutôt le lien direct vers une image.",
+        it: "Il caricamento dei file non è attivo su questo server: incolla invece il link diretto a un'immagine."
+      },
+      imageOk: { en: "Image loaded", fr: "Image chargée", it: "Immagine caricata" },
+      imageError: {
+        en: "This link does not lead to a viewable image",
+        fr: "Ce lien ne mène pas à une image affichable",
+        it: "Questo link non porta a un'immagine visualizzabile"
+      },
       searchCountry: { en: "Search a country…", fr: "Rechercher un pays…", it: "Cerca un paese…" },
       noCountryFound: { en: "No country found", fr: "Aucun pays trouvé", it: "Nessun paese trovato" },
       errPhone: {

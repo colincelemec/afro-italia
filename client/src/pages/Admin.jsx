@@ -268,6 +268,13 @@ const Admin = () => {
                       <span className={`ad-badge ad-badge--${meta.cls}`}>
                         <Icon name={meta.icon} size={12} /> {t(`app.admin.status_${b.status}`)}
                       </span>
+                      {/* Publiée mais pas encore contrôlée : elle est
+                          visible du public et attend seulement le badge. */}
+                      {b.status === 'VERIFIED' && !b.isVerified && (
+                        <span className="ad-badge ad-badge--tocheck">
+                          <Icon name="clock" size={12} /> {t('app.admin.toCheck')}
+                        </span>
+                      )}
                     </td>
                     <td data-label={t('app.admin.colCreated')}>{fmtDate(b.createdAt)}</td>
                     <td data-label={t('app.admin.colActions')} className="ad-actions">

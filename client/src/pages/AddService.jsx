@@ -17,6 +17,7 @@ import Icon from '../components/common/Icon';
 import CitySelect from '../components/common/CitySelect';
 import { getCategoryLabel } from '../utils/categoryLabel';
 import PhoneInput from '../components/common/PhoneInput';
+import ImageUpload from '../components/common/ImageUpload';
 import '../styles/AddService.css';
 
 // Fix icone Leaflet (path di default rotto con i bundler)
@@ -494,16 +495,20 @@ const AddService = () => {
             <h3 className="as-card__title">{t('app.addService.sectionImages')}</h3>
             <p className="as-hint as-hint--block">{t('app.addService.imagesHelp')}</p>
             <div className="as-row">
-              <div className="as-field">
-                <label htmlFor="logo">{t('app.addService.logo')}</label>
-                <input id="logo" name="logo" type="url" value={form.logo}
-                  onChange={handleChange} className="as-input" placeholder="https://…" />
-              </div>
-              <div className="as-field">
-                <label htmlFor="coverImage">{t('app.addService.cover')}</label>
-                <input id="coverImage" name="coverImage" type="url" value={form.coverImage}
-                  onChange={handleChange} className="as-input" placeholder="https://…" />
-              </div>
+              <ImageUpload
+                value={form.logo}
+                onChange={(url) => setForm(p => ({ ...p, logo: url }))}
+                folder="afroitalia/logos"
+                label={t('app.addService.logo')}
+                t={(k) => t(`app.addService.${k}`)}
+              />
+              <ImageUpload
+                value={form.coverImage}
+                onChange={(url) => setForm(p => ({ ...p, coverImage: url }))}
+                folder="afroitalia/covers"
+                label={t('app.addService.cover')}
+                t={(k) => t(`app.addService.${k}`)}
+              />
             </div>
           </section>
 

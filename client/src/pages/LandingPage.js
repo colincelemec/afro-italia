@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import Icon from '../components/common/Icon';
+import SafeImage from '../components/common/SafeImage';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { getCategoryLabel } from '../utils/categoryLabel';
@@ -300,11 +301,12 @@ const LandingPage = () => {
               {featured.map((b) => (
                 <Link key={b.id} to={`/businesses/${b.slug}`} className="home-card">
                   <div className="home-card__media">
-                    {b.coverImage || b.logo ? (
-                      <img src={b.coverImage || b.logo} alt={b.name} loading="lazy" />
-                    ) : (
-                      <Icon name="store" size={38} className="home-card__fallback" />
-                    )}
+                    <SafeImage
+                      src={b.coverImage || b.logo}
+                      alt={b.name}
+                      loading="lazy"
+                      fallback={<Icon name="store" size={38} className="home-card__fallback" />}
+                    />
                   </div>
                   <div className="home-card__body">
                     <h3>{b.name}</h3>

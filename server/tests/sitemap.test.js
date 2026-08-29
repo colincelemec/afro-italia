@@ -47,7 +47,7 @@ describe('GET /sitemap.xml', () => {
     // Ne demande que les activités publiées
     expect(mockPrisma.business.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { status: 'VERIFIED', isVerified: true },
+        where: { status: 'VERIFIED' },
       })
     );
   });

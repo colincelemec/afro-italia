@@ -11,6 +11,7 @@ import { getTranslation } from '../locales/translations';
 import usePageMeta from '../hooks/usePageMeta';
 import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
+import SafeImage from '../components/common/SafeImage';
 import ConfirmDialog from '../components/common/ConfirmDialog';
 import '../styles/Dashboard.css';
 
@@ -38,9 +39,12 @@ const BizCard = ({ business, onClick, language }) => (
   <article className="dh-bizcard" onClick={onClick} role="button" tabIndex={0}
     onKeyDown={e => e.key === 'Enter' && onClick()}>
     <div className="dh-bizcard__media">
-      {business.coverImage || business.logo
-        ? <img src={business.coverImage || business.logo} alt={business.name} loading="lazy" />
-        : <Icon name="store" size={40} className="dh-bizcard__fallback" />}
+      <SafeImage
+        src={business.coverImage || business.logo}
+        alt={business.name}
+        loading="lazy"
+        fallback={<Icon name="store" size={40} className="dh-bizcard__fallback" />}
+      />
     </div>
     <div className="dh-bizcard__body">
       <h4>{business.name}</h4>

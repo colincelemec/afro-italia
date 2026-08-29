@@ -104,4 +104,59 @@ describe('POST /api/businesses', () => {
     const res = await request(app).post('/api/businesses').send({ name: 'Test' });
     expect(res.status).toBe(401);
   });
+
+  // Comportement voulu : une activité publiée apparaît tout de suite
+  // dans l'annuaire, y compris pour les visiteurs sans compte.
+  it('publie l\'activité immédiatement, sans badge de vérification', async () => {
+    const jwt = require('jsonwebtoken');
+    const user = {
+      id: 'user_1', email: 'a@b.c', firstName: 'A', lastName: 'B',
+      role: 'USER', avatar: null, isVerified: true,
+    };
+    mockPrisma.user.findUnique.mockResolvedValue(user);
+    mockPrisma.city.findUnique.mockResolvedValue({ id: 'city_1', latitude: 45.4, longitude: 9.1 });
+    mockPrisma.category.findUnique.mockResolvedValue({ id: 'cat_1' });
+    mockPrisma.business.findUnique.mockResolvedValue(null);
+    mockPrisma.business.create.mockResolvedValue({ id: 'biz_new' });
+
+    const res = await request(app)
+      .post('/api/businesses')
+      .set('Authorization', `Bearer ${jwt.sign({ id: user.id }, process.env.JWT_SECRET)}`)
+      .send({
+        name: 'PC Repair Modena',
+        description: 'Riparazione computer e assistenza informatica a Modena.',
+        cityId: 'city_1',
+        categoryId: 'cat_1',
+        address: 'Via Emilia 10',
+      });
+
+    expect(res.status).toBe(201);
+    const created = mockPrisma.business.create.mock.calls[0][0].data;
+    expect(created.status).toBe('VERIFIED');   // visible dans l'annuaire
+    expect(created.isVerified).toBe(false);    // mais pas encore de badge
+  });
+});
+
+describe('Visibilité publique', () => {
+  // Régression : le filtre exigeait isVerified, donc toute activité
+  // fraîchement publiée restait invisible tant qu'un admin n'agissait pas.
+  it('n\'exige pas le badge de vérification pour être listée', async () => {
+    mockPrisma.business.findMany.mockResolvedValue([]);
+    mockPrisma.business.count.mockResolvedValue(0);
+
+    await request(app).get('/api/businesses');
+
+    const where = mockPrisma.business.findMany.mock.calls[0][0].where;
+    expect(where.status).toBe('VERIFIED');
+    expect(where.isVerified).toBeUndefined();
+  });
+
+  it('n\'exige pas le badge dans la recherche', async () => {
+    mockPrisma.business.findMany.mockResolvedValue([]);
+
+    await request(app).get('/api/businesses/search').query({ q: 'repair' });
+
+    const where = mockPrisma.business.findMany.mock.calls[0][0].where;
+    expect(where.isVerified).toBeUndefined();
+  });
 });

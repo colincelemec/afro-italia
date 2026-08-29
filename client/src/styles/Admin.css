@@ -447,3 +447,11 @@
   .ad-claim__actions { width: 100%; }
   .ad-claim__actions .ad-btn { flex: 1; justify-content: center; }
 }
+
+/* Fiche publiée mais pas encore contrôlée par l'équipe :
+   visible du public, en attente du badge « vérifié ». */
+.ad-badge--tocheck {
+  margin-left: 6px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}

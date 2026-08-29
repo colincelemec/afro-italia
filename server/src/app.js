@@ -17,6 +17,7 @@ const reviewRoutes = require('./routes/reviews');
 const userRoutes = require('./routes/users');
 const adminRoutes = require('./routes/admin');
 const metaRoutes = require('./routes/meta');
+const uploadRoutes = require('./routes/uploads');
 const sitemapController = require('./controllers/sitemapController');
 
 // Import middlewares
@@ -107,6 +108,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/meta', metaRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // ============================================
 // ROUTE 404

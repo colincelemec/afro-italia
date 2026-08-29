@@ -14,6 +14,7 @@ import { getTranslation } from '../locales/translations';
 import usePageMeta from '../hooks/usePageMeta';
 import { getCategoryLabel } from '../utils/categoryLabel';
 import Icon from '../components/common/Icon';
+import SafeImage from '../components/common/SafeImage';
 import '../styles/BusinessDetail.css';
 
 // Fix leaflet default marker icons
@@ -218,7 +219,11 @@ const BusinessDetail = () => {
         {allImages.length > 0 ? (
           <>
             <div className="bd-cover-main">
-              <img src={allImages[activeImage]} alt={business.name} />
+              <SafeImage
+                src={allImages[activeImage]}
+                alt={business.name}
+                fallback={<Icon name="store" size={56} className="bd-cover-fallback" />}
+              />
             </div>
             {allImages.length > 1 && (
               <div className="bd-thumbs">
@@ -245,7 +250,7 @@ const BusinessDetail = () => {
       <div className="bd-header">
         <div className="bd-header-inner">
           <div className="bd-header-left">
-            {business.logo && <img src={business.logo} alt="" className="bd-logo" />}
+            <SafeImage src={business.logo} alt="" className="bd-logo" fallback={null} />
             <div>
               <div className="bd-title-row">
                 <h1 className="bd-title">{business.name}</h1>
