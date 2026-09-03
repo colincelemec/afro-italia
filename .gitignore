@@ -52,15 +52,10 @@ yarn-error.log*
 pnpm-debug.log*
 
 # ============================================
-# UPLOADS (fichiers utilisateur)
-# ============================================
-/server/uploads/*
-!/server/uploads/.gitkeep
-
-# ============================================
 # PRISMA
+# Les migrations, elles, DOIVENT être committées :
+# c'est l'historique du schéma en production.
 # ============================================
-/server/prisma/migrations/*_
 .prisma/
 
 # ============================================

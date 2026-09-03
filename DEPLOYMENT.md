@@ -139,8 +139,15 @@ will create the tables in production.
 ```bash
 cd server
 docker compose up -d postgres      # the local database must be running
-npm run db:migrate:init
+npm run db:migrate:baseline
 ```
+
+> **Why `baseline` and not `migrate dev`?** The local database was originally
+> created with `prisma db push`, which builds the tables without recording any
+> migration history. `prisma migrate dev` sees that empty history, reports
+> "drift", and offers to **wipe the database**. The baseline script instead
+> generates the SQL from the schema and marks it as already applied — same
+> result, no data loss. Run it once; afterwards use `npm run db:migrate`.
 
 Prisma creates a folder `prisma/migrations/…_init/` containing `migration.sql`.
 **This folder must be committed:**
@@ -576,7 +583,7 @@ Railway and Vercel redeploy automatically. Nothing else to do.
 ```bash
 # 1. Edit prisma/schema.prisma
 # 2. Create the migration locally
-cd server && npm run db:migrate:init   # or: npx prisma migrate dev --name description
+cd server && npm run db:migrate        # Prisma prompts for a migration name
 # 3. Push it — production applies it automatically
 git add prisma/migrations && git commit -m "…" && git push
 ```
@@ -617,8 +624,8 @@ curl https://YOUR-API/health
 cd server && npm test
 cd client && npm run check:i18n && npm run build
 
-# Create a migration
-cd server && npm run db:migrate:init
+# Create a migration (only after changing prisma/schema.prisma)
+cd server && npm run db:migrate
 ```
 
 ---

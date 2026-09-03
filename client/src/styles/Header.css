@@ -21,6 +21,10 @@
 }
 
 .header-logo h1 {
+  /* Aligne le logo et le nom sur la même ligne médiane */
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 1.5rem;
   color: var(--color-primary);
   margin: 0;
@@ -156,30 +160,6 @@
   }
 }
 
-.header-logo h1 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.logo-icon { flex-shrink: 0; }
-
-/* ── Logo immagine (sostituisce il globo) ── */
-.logo-img {
-  height: 40px;
-  width: auto;
-  object-fit: contain;
-  flex-shrink: 0;
-  /* alone chiaro: rende leggibile la "I" nera sul tema scuro */
-  filter: drop-shadow(0 0 1.5px rgba(240, 246, 252, 0.8))
-          drop-shadow(0 0 6px rgba(240, 246, 252, 0.35));
-}
-
-/* Sul lato chiaro l'alone non serve */
-[data-theme='light'] .logo-img {
-  filter: none;
-}
-
-
 /* ============================================
    Header scuro in stile GitHub (solo home "/")
    ============================================ */
@@ -193,10 +173,6 @@
 
 .header-dark .header-logo h1 {
   color: #f0f6fc;
-}
-
-.header-dark .logo-icon {
-  color: #E8A33D;
 }
 
 .header-dark .login-button {
@@ -252,7 +228,6 @@
 }
 
 [data-theme='light'] .header-dark .header-logo h1 { color: var(--color-text); }
-[data-theme='light'] .header-dark .logo-icon { color: var(--color-primary); }
 
 [data-theme='light'] .header-dark .login-button {
   color: var(--color-primary);
@@ -338,8 +313,7 @@
 
 .header-over-hero .login-button:hover { background: rgba(255, 255, 255, 0.24); }
 
-/* Sélecteurs de langue et de thème en blanc */
-.header-over-hero .lang-selector button,
+/* Bouton de thème en blanc, lisible sur la photo */
 .header-over-hero .theme-toggle {
   color: #fff;
   border-color: rgba(255, 255, 255, 0.28);
@@ -353,3 +327,38 @@
 }
 
 .header-over-hero .mobile-nav .nav-link { color: #fff; }
+
+/* ============================================
+   LOGO À CÔTÉ DU NOM
+   Le logo est dessiné en foncé sur clair : sur le thème
+   sombre et sur la photo du hero, on lui pose une pastille
+   crème pour qu'il reste lisible.
+   ============================================ */
+.logo-img {
+  height: 40px;
+  width: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 50%;
+  /* Léger fond crème : le logo garde son contraste partout */
+  background: #fffef9;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+/* Sur le thème clair, la pastille se fond dans la page :
+   une ombre très douce suffit à la détacher. */
+[data-theme='light'] .logo-img {
+  box-shadow: 0 1px 3px rgba(51, 38, 28, .10);
+}
+
+/* Sur fond sombre et sur la photo du hero, la pastille assume
+   son rôle : elle isole le logo du fond. */
+[data-theme='dark'] .logo-img,
+.header-over-hero .logo-img {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .35);
+}
+
+@media (max-width: 620px) {
+  .logo-img { height: 34px; width: 34px; }
+}

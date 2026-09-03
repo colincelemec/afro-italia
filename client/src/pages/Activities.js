@@ -236,37 +236,6 @@ const Activities = () => {
     boardRef.current?.scrollBy({ left: dir * 320, behavior: 'smooth' });
   };
 
-  // ── Slider della lista risultati: frecce sinistra/destra ──
-  const listRef = useRef(null);
-  const [canScroll, setCanScroll] = useState({ left: false, right: false });
-
-  const updateArrows = useCallback(() => {
-    const el = listRef.current;
-    if (!el) return;
-    setCanScroll({
-      left: el.scrollLeft > 4,
-      right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4,
-    });
-  }, []);
-
-  useEffect(() => {
-    const el = listRef.current;
-    if (!el || view !== 'grid') return;
-    updateArrows();
-    el.addEventListener('scroll', updateArrows, { passive: true });
-    window.addEventListener('resize', updateArrows);
-    return () => {
-      el.removeEventListener('scroll', updateArrows);
-      window.removeEventListener('resize', updateArrows);
-    };
-  }, [view, visible, updateArrows]);
-
-  const scrollList = (dir) => {
-    const el = listRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
-  };
-
   const goTo = (slug) => navigate(`/businesses/${slug}`);
 
   // ── Selezione di un suggerimento → vai alla scheda ──
@@ -579,19 +548,12 @@ const Activities = () => {
           </div>
         ) : (
 
-          /* ──────── VISTA GRIGLIA / SLIDER ──────── */
+          /* ──────── VUE GRILLE ────────
+             Les activités se suivent verticalement : à chaque « charger
+             plus », les nouvelles s'ajoutent en dessous. Un carrousel
+             horizontal masquait les résultats déjà chargés. */
           <>
-            <div className="act-slider">
-              <button
-                className="act-slider__arrow act-slider__arrow--left"
-                onClick={() => scrollList(-1)}
-                disabled={!canScroll.left}
-                aria-label={t('app.activities.a11yScrollLeft')}
-              >
-                <Icon name="arrowL" size={22} />
-              </button>
-
-              <div className="act-slider__track" ref={listRef}>
+            <div className="act-grid">
               {visible.map(b => (
                 <article
                   key={b.id}
@@ -637,16 +599,6 @@ const Activities = () => {
                   </div>
                 </article>
               ))}
-              </div>
-
-              <button
-                className="act-slider__arrow act-slider__arrow--right"
-                onClick={() => scrollList(1)}
-                disabled={!canScroll.right}
-                aria-label={t('app.activities.a11yScrollRight')}
-              >
-                <Icon name="arrowR" size={22} />
-              </button>
             </div>
 
             {!search && page < pagination.totalPages && (

@@ -8,7 +8,6 @@ import LanguageSelector from '../common/LanguageSelector';
 import ThemeToggle from '../common/ThemeToggle';
 import BrandName from '../common/BrandName';
 import ConfirmDialog from '../common/ConfirmDialog';
-import logo from '../../assets/logo_AfroItalia.png';
 import useAuthStore from '../../stores/authStore';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getTranslation } from '../../locales/translations';
@@ -49,7 +48,16 @@ const Header = () => {
       <div className="header-container">
         <div className="header-logo">
           <Link to={isAuthenticated ? "/dashboard" : "/"}>
-            <h1><img src={logo} alt="Logo AfroItalia" className="logo-img" /> <BrandName /></h1>
+            <h1>
+              <img
+                src="/logo-afroitalia.png"
+                alt=""
+                className="logo-img"
+                width="40"
+                height="40"
+              />
+              <BrandName />
+            </h1>
           </Link>
         </div>
 

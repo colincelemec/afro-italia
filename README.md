@@ -83,7 +83,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
 # Database + data
 cd ../server
 docker compose up -d postgres
-npx prisma migrate dev --name init
+npx prisma migrate deploy
 npm run db:seed && npm run db:seed:cities
 node prisma/seeds/businesses-reali.js
 

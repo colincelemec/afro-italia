@@ -89,6 +89,41 @@ describe('POST /api/businesses/:id/claim', () => {
   });
 });
 
+// C'est cette route qui décide de l'état du bouton sur la fiche publique :
+// « Revendiquer », « Demande en cours » ou « Demande refusée ».
+describe('GET /api/businesses/:id/claim/me', () => {
+  const getMyClaim = (who = user) =>
+    request(app)
+      .get(`/api/businesses/${business.id}/claim/me`)
+      .set('Authorization', `Bearer ${tokenFor(who.id)}`);
+
+  it('renvoie la demande en cours du visiteur connecté', async () => {
+    mockPrisma.businessClaim.findUnique.mockResolvedValue({
+      id: 'claim_1', status: 'PENDING', createdAt: new Date(), adminNote: null,
+    });
+    const res = await getMyClaim();
+    expect(res.status).toBe(200);
+    expect(res.body.data.status).toBe('PENDING');
+    expect(mockPrisma.businessClaim.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { businessId_userId: { businessId: business.id, userId: user.id } },
+      })
+    );
+  });
+
+  it('renvoie null quand le visiteur n\'a jamais rien demandé', async () => {
+    mockPrisma.businessClaim.findUnique.mockResolvedValue(null);
+    const res = await getMyClaim();
+    expect(res.status).toBe(200);
+    expect(res.body.data).toBeNull();
+  });
+
+  it('refuse sans authentification (401)', async () => {
+    const res = await request(app).get(`/api/businesses/${business.id}/claim/me`);
+    expect(res.status).toBe(401);
+  });
+});
+
 describe('PATCH /api/admin/claims/:id', () => {
   const claim = {
     id: 'claim_1',

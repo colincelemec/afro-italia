@@ -131,8 +131,8 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
 # 4. Start the database
 cd ../server && docker compose up -d postgres
 
-# 5. Create the tables
-npx prisma migrate dev --name init
+# 5. Create the tables (applies the committed migrations)
+npx prisma migrate deploy
 
 # 6. Load the data
 npm run db:seed              # categories + demo accounts

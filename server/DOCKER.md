@@ -71,8 +71,8 @@ docker compose down                # stop everything
 ## Database commands
 
 ```bash
-# Create/update the tables
-npx prisma migrate dev
+# Create the tables (applies the committed migrations)
+npx prisma migrate deploy
 
 # Load the data
 npm run db:seed              # categories + demo accounts
@@ -107,7 +107,7 @@ docker compose exec -T postgres psql -U postgres afroitalia_db < backup.sql
 ```bash
 docker compose down -v       # removes the containers AND the volumes
 docker compose up -d postgres
-npx prisma migrate dev
+npx prisma migrate deploy
 npm run db:seed && npm run db:seed:cities
 node prisma/seeds/businesses-reali.js
 ```

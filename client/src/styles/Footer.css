@@ -46,19 +46,6 @@
   margin-bottom: 0.5rem;
 }
 
-.footer-description,
-.footer-description-it {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #8d96a0;
-}
-
-.footer-description-it {
-  font-style: italic;
-  color: #6e7681;
-  font-size: 0.9rem;
-}
-
 .footer-links {
   list-style: none;
   padding: 0;
@@ -254,9 +241,6 @@
 
 [data-theme='light'] .footer-description,
 [data-theme='light'] .footer-links a { color: var(--color-muted); }
-
-[data-theme='light'] .footer-description-it,
-[data-theme='light'] .footer-copyright p { color: var(--color-muted); }
 
 [data-theme='light'] .footer-links a:hover { color: var(--color-primary); }
 

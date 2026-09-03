@@ -15,7 +15,7 @@
 import { useEffect } from 'react';
 
 const SITE_NAME = 'AfroItalia';
-const DEFAULT_IMAGE = '/logo_AfroItalia.png';
+const DEFAULT_IMAGE = '/logo-afroitalia.png';
 
 /** Crée ou met à jour une balise <meta> */
 function setMeta(attr, key, content) {

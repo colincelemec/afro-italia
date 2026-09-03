@@ -141,22 +141,6 @@ code {
   --card-shadow-hover: var(--shadow);
 }
 
-/* Cartes d'activités, panneaux, encadrés : coins plus ronds */
-[data-theme='light'] .act-card,
-[data-theme='light'] .act-slide,
-[data-theme='light'] .dh-bizcard,
-[data-theme='light'] .dh-stat,
-[data-theme='light'] .ad-card,
-[data-theme='light'] .ad-claim,
-[data-theme='light'] .bd-sidebar-card,
-[data-theme='light'] .bd-review-card,
-[data-theme='light'] .sub-plan {
-  border-color: transparent;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--card-shadow);
-  transition: box-shadow 0.22s ease, transform 0.22s ease;
-}
-
 [data-theme='light'] .act-card:hover,
 [data-theme='light'] .act-slide:hover,
 [data-theme='light'] .dh-bizcard:hover {

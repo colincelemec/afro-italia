@@ -1,15 +1,29 @@
 {
   "short_name": "AfroItalia",
-  "name": "AfroItalia - Entreprises Africaines en Italie",
+  "name": "AfroItalia — African businesses in Italy",
+  "description": "Find and support African diaspora businesses across Italy.",
+  "lang": "it",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "64x64 48x48 32x32 24x24 16x16",
       "type": "image/x-icon"
+    },
+    {
+      "src": "logo-afroitalia.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "logo-afroitalia.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#b4552d",
+  "background_color": "#fdfaf6"
 }
